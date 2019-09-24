@@ -35,9 +35,8 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                 
                 if boundary(triangle[i]) and boundary(triangle[j]):
                     dL=numpy.linalg.norm(numpy.subtract(solute[i][:2],solute[j][:2]))
-                    addition=(h(triangle[i])+h(triangle[j]))*dL/2
-                    B[node_map[triangle[i]]]+=addition
-                    B[node_map[triangle[j]]]+=addition
+                    B[node_map[triangle[i]]]+=(h(triangle[i])/3+h(triangle[j])/6)*dL
+                    B[node_map[triangle[j]]]+=(h(triangle[j])/3+h(triangle[i])/6)*dL
                 
         area=abs(numpy.cross(numpy.subtract(solute[1][:2],solute[0][:2]),numpy.subtract(solute[2][:2],solute[0][:2])))/2
         centroid=[(solute[0][0]+solute[1][0]+solute[2][0])/3,(solute[0][1]+solute[1][1]+solute[2][1])/3]
@@ -55,7 +54,7 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
             if not fixed(triangle[i]):
                 B[node_map[triangle[i]]]-=area*numpy.dot(gradients[i],G_gradient)
     #print("A:\n",A,"\nB:\n",B)
-    return numpy.linalg.solve(A,B)
+    return numpy.linalg.lstsq(A,B)[0]
     
 class mesh:
     nodes=[]
@@ -76,8 +75,8 @@ for i in range(0,L1):
 def test_boundary(i):
     return i<L2 or i>L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    #return 0
-    if i>L2*(L1-1) or i%L2==0 or (i+1)%L2==0:
+    return 0
+    if i>L2*(L1-1) or i%L2==0:
         return 1
     else:
         return 0
@@ -94,9 +93,9 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    #return 10
-    if x>1/2:
-        return 20
+    return 0
+    if x>y:
+        return 1
     else:
         return -1
     #return (x-L1/2)*1+(y-L2/2)*4
@@ -105,8 +104,20 @@ def test_f(x,y):
     else:
         return 0
 def test_h(i):
-    return 1
-    return (L2*L1/2-i)*2/L2/L1
+    #return 1
+    if i<L2:
+        return 1
+    elif (i+1)%L2==0:
+        return 0
+    elif i>L2*(L1-1):
+        return 1
+    else:
+        return 0
+    if i<L2*L1/2:
+        return 1
+    else:
+        return -1
+    return i*(L2-1-i)/L2/L2*10
 
 solve=homogenousdirichlet(test_mesh,test_boundary,test_f,test_fixed,test_g,test_h)
 
