@@ -66,8 +66,8 @@ class mesh:
     triangles=[]
 
 test_mesh=mesh()
-L1=50
-L2=50
+L1=20
+L2=20
 for i in range(0,L1):
     for j in range(0,L2):
         test_mesh.nodes.append([i/(L1-1),j/(L2-1)])

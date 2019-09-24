@@ -32,8 +32,15 @@ def product(A,B):
             row.append(sum)
         C.append(row)
     return C
-            
-        
+
+def thomasalgorithm(a,b,c,r):
+    for i in range(0,len(a)):
+        if i>0:
+            a[i-1]=0
+        c[i]/=b[i]
+        r[i]/=b[i]
+        b[i]=1
+        #TODO: thomas & cholesky
     
 
 def gaussianelimination(A_,b_,scaledpartialpivot):
