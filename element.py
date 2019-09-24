@@ -32,11 +32,11 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                 A[node_map[triangle[i]],node_map[triangle[j]]]+=addition
                 if i!=j:
                     A[node_map[triangle[j]],node_map[triangle[i]]]+=addition
-                
-                if boundary(triangle[i]) and boundary(triangle[j]):
-                    dL=numpy.linalg.norm(numpy.subtract(solute[i][:2],solute[j][:2]))
-                    B[node_map[triangle[i]]]+=(h(triangle[i],triangle[j])/3+h(triangle[j],triangle[i])/6)*dL
-                    B[node_map[triangle[j]]]+=(h(triangle[j],triangle[i])/3+h(triangle[i],triangle[j])/6)*dL
+                    
+                    if boundary(triangle[i]) and boundary(triangle[j]):
+                        dL=numpy.linalg.norm(numpy.subtract(solute[i][:2],solute[j][:2]))
+                        B[node_map[triangle[i]]]+=(h(triangle[i],triangle[j])/3+h(triangle[j],triangle[i])/6)*dL
+                        B[node_map[triangle[j]]]+=(h(triangle[j],triangle[i])/3+h(triangle[i],triangle[j])/6)*dL
                 
         area=abs(numpy.cross(numpy.subtract(solute[1][:2],solute[0][:2]),numpy.subtract(solute[2][:2],solute[0][:2])))/2
         centroid=[(solute[0][0]+solute[1][0]+solute[2][0])/3,(solute[0][1]+solute[1][1]+solute[2][1])/3]
@@ -55,14 +55,19 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                 B[node_map[triangle[i]]]-=area*numpy.dot(gradients[i],G_gradient)
     #print("A:\n",A,"\nB:\n",B)
     return numpy.linalg.lstsq(A,B)[0]
+    #A=numpy.delete(A,0,0)
+    #A=numpy.delete(A,0,1)
+    #B=numpy.delete(B,0,0)
+    #x=numpy.linalg.solve(A,B)
+    #return numpy.concatenate((numpy.zeros(1),x))
     
 class mesh:
     nodes=[]
     triangles=[]
 
 test_mesh=mesh()
-L1=20
-L2=20
+L1=50
+L2=50
 for i in range(0,L1):
     for j in range(0,L2):
         test_mesh.nodes.append([i/(L1-1),j/(L2-1)])
@@ -75,7 +80,8 @@ for i in range(0,L1):
 def test_boundary(i):
     return i<L2 or i>L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    if i==0:return 0
+    return 0
+    if i==L2/2 or i==L2/2-1 :return 1
     else:return 0
     if test_boundary(i):return 1
     else:return 0
