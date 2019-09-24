@@ -35,8 +35,8 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                 
                 if boundary(triangle[i]) and boundary(triangle[j]):
                     dL=numpy.linalg.norm(numpy.subtract(solute[i][:2],solute[j][:2]))
-                    B[node_map[triangle[i]]]+=(h(triangle[i])/3+h(triangle[j])/6)*dL
-                    B[node_map[triangle[j]]]+=(h(triangle[j])/3+h(triangle[i])/6)*dL
+                    B[node_map[triangle[i]]]+=(h(triangle[i],triangle[j])/3+h(triangle[j],triangle[i])/6)*dL
+                    B[node_map[triangle[j]]]+=(h(triangle[j],triangle[i])/3+h(triangle[i],triangle[j])/6)*dL
                 
         area=abs(numpy.cross(numpy.subtract(solute[1][:2],solute[0][:2]),numpy.subtract(solute[2][:2],solute[0][:2])))/2
         centroid=[(solute[0][0]+solute[1][0]+solute[2][0])/3,(solute[0][1]+solute[1][1]+solute[2][1])/3]
@@ -75,12 +75,20 @@ for i in range(0,L1):
 def test_boundary(i):
     return i<L2 or i>L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    return 0
+    if i==0:return 0
+    else:return 0
+    if test_boundary(i):return 1
+    else:return 0
+    if i==L2-1:
+        return 1
+    else:
+        return 0
     if i>L2*(L1-1) or i%L2==0:
         return 1
     else:
         return 0
 def test_g(i):
+    return 5
     if i<L2:
         return i/L2
     elif (i+1)%L2==0:
@@ -93,7 +101,7 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    return 0
+    return 4
     if x>y:
         return 1
     else:
@@ -103,16 +111,25 @@ def test_f(x,y):
         return 1
     else:
         return 0
-def test_h(i):
-    #return 1
-    if i<L2:
-        return 1
-    elif (i+1)%L2==0:
-        return 0
-    elif i>L2*(L1-1):
-        return 1
-    else:
-        return 0
+def test_h(i,towards):
+    return -1
+    multiplier=10
+    if i>0 and i<L2-1:
+        return -1
+    elif i==0 and towards!=L2:
+        return -1
+    elif i==L2-1 and towards==L2-2:
+        return -1
+    else:return 0
+        #return -i/L2*(L2-1-i)/L2*multiplier
+    if (i+1)%L2==0:
+        return -(L1-(i+1)/L2)/L1*(i/L2)/L1*multiplier
+    else:return 0
+    if i>L2*(L1-1):
+        return -(i-L2*(L1-1))/L1*(L2*L1-i)/L1*multiplier
+    if i%L2==0:
+        return -i/L2/L1*(L1-i/L2)/L1*multiplier
+    
     if i<L2*L1/2:
         return 1
     else:
@@ -126,8 +143,9 @@ from matplotlib import cm
 from mpl_toolkits import mplot3d
 
 bafar=0
-b = numpy.arange(bafar, L2-bafar, 1)
-d = numpy.arange(bafar, L1-bafar, 1)
+b = numpy.arange(0, 1, 1/L2)
+d = numpy.arange(0, 1, 1/L1)
+
 nu = numpy.zeros( (d.size, b.size) )
 counter= 0
 
