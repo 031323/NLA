@@ -1,4 +1,5 @@
 import copy
+import math
 def innerproduct(a,b):
 	if len(a)!=len(b):
 		raise ValueError
@@ -34,14 +35,36 @@ def product(A,B):
     return C
 
 def thomasalgorithm(a,b,c,r):
-    for i in range(0,len(a)):
+    for i in range(0,len(r)):
         if i>0:
+            b[i]-=c[i-1]*a[i]
+            r[i]-=r[i-1]*a[i]
             a[i-1]=0
-        c[i]/=b[i]
+        if i<len(c):c[i]/=b[i]
         r[i]/=b[i]
         b[i]=1
-        #TODO: thomas & cholesky
-    
+    x=[0]*len(r)
+    x[len(r)-1]=r[len(r-1)]
+    for i in range(len(r)-2,-1,-1):
+        x[i]=r[i]-c[i]*x[i+1]
+    return x
+
+
+def cholskey(A):
+    r=[[0 for i in range(len(A)] for j in range(len(a))]
+    for i in range(0,len(A)):
+        for j in range(i,len(A):
+            if i==j:
+                s=0
+                for k in range(0,i):
+                    s+=r[i][k]*r[i][k]
+                r[i][i]=math.sqrt(a[i][i]-s)
+            else:
+                s=0
+                for k in range(0,i):
+                    s+=r[i][k]*r[j][k]
+                r[j][i]=(a[i][j]-s)/r[i][i]
+    return r
 
 def gaussianelimination(A_,b_,scaledpartialpivot):
     A=copy.deepcopy(A_)
