@@ -26,17 +26,15 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
         area=abs(numpy.cross(numpy.subtract(solute[1][:2],solute[0][:2]),numpy.subtract(solute[2][:2],solute[0][:2])))/2
         for i in range(0,3):
             for j in range(i,3):
-                if fixed(triangle[i]) or fixed(triangle[j]):
-                    continue
-                addition=numpy.dot(gradients[i],gradients[j])*area;
-                A[node_map[triangle[i]],node_map[triangle[j]]]+=addition
-                if i!=j:
-                    A[node_map[triangle[j]],node_map[triangle[i]]]+=addition
-                    
-                    if boundary(triangle[i]) and boundary(triangle[j]):
-                        dL=numpy.linalg.norm(numpy.subtract(solute[i][:2],solute[j][:2]))
-                        B[node_map[triangle[i]]]+=(h(triangle[i],triangle[j])/3+h(triangle[j],triangle[i])/6)*dL
-                        B[node_map[triangle[j]]]+=(h(triangle[j],triangle[i])/3+h(triangle[i],triangle[j])/6)*dL
+                if not(fixed(triangle[i]) or fixed(triangle[j])):
+                    addition=numpy.dot(gradients[i],gradients[j])*area;
+                    A[node_map[triangle[i]],node_map[triangle[j]]]+=addition
+                    if i!=j:
+                        A[node_map[triangle[j]],node_map[triangle[i]]]+=addition
+                if (i!=j) and boundary(triangle[i]) and boundary(triangle[j]) and (not(fixed(triangle[i]) and fixed(triangle[j]))):
+                    dL=numpy.linalg.norm(numpy.subtract(solute[i][:2],solute[j][:2]))
+                    if not fixed(triangle[i]):B[node_map[triangle[i]]]+=(h(triangle[i],triangle[j])/2+h(triangle[j],triangle[i])/2)/2*dL
+                    if not fixed(triangle[j]):B[node_map[triangle[j]]]+=(h(triangle[j],triangle[i])/2+h(triangle[i],triangle[j])/2)/2*dL
                 
         area=abs(numpy.cross(numpy.subtract(solute[1][:2],solute[0][:2]),numpy.subtract(solute[2][:2],solute[0][:2])))/2
         centroid=[(solute[0][0]+solute[1][0]+solute[2][0])/3,(solute[0][1]+solute[1][1]+solute[2][1])/3]
@@ -54,7 +52,9 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
             if not fixed(triangle[i]):
                 B[node_map[triangle[i]]]-=area*numpy.dot(gradients[i],G_gradient)
     #print("A:\n",A,"\nB:\n",B)
-    return numpy.linalg.lstsq(A,B)[0]
+    if n_free_nodes==len(mesh.nodes):
+        return numpy.linalg.lstsq(A,B)[0]
+    else:return numpy.linalg.solve(A,B)
     #A=numpy.delete(A,0,0)
     #A=numpy.delete(A,0,1)
     #B=numpy.delete(B,0,0)
@@ -78,12 +78,15 @@ for i in range(0,L1):
             v10=L2*i+j-1
             test_mesh.triangles+=[[v00,v01,v11],[v00,v11,v10]]
 def test_boundary(i):
-    return i<L2 or i>L2*(L1-1) or i%L2==0 or (i+1)%L2==0
+    return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    return 0
-    if i==L2/2 or i==L2/2-1 :return 1
+    if i==0:return 1
     else:return 0
-    if test_boundary(i):return 1
+    #if i==L2/2 or i==L2/2-1 :return 1
+    #else:return 0
+    return 0
+    if test_boundary(i):
+        if i<L2 or i%L2==0:return 1
     else:return 0
     if i==L2-1:
         return 1
@@ -94,7 +97,7 @@ def test_fixed(i):
     else:
         return 0
 def test_g(i):
-    return 5
+    return 0
     if i<L2:
         return i/L2
     elif (i+1)%L2==0:
@@ -107,7 +110,8 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    return 4
+    return -1.3333333
+    return -2*x*x-2*y*y
     if x>y:
         return 1
     else:
@@ -117,8 +121,21 @@ def test_f(x,y):
         return 1
     else:
         return 0
+def test_xy(i):
+    return test_mesh.nodes[i][0],test_mesh.nodes[i][1]
 def test_h(i,towards):
-    return -1
+    #return -1
+    x,y=test_xy(i)
+    return (x-0.5)*(x-0.5)+(y-0.5)*(y-0.5)
+    if i<L2:
+        return 0
+    elif (i+1)%L2==0:
+        return 2*x*x+2
+    elif i%L2==0:
+        return -2
+    elif i>=L2*(L1-1):
+        return 2*y*y
+    else:raise ValueError
     multiplier=10
     if i>0 and i<L2-1:
         return -1
@@ -155,6 +172,7 @@ d = numpy.arange(0, 1, 1/L1)
 nu = numpy.zeros( (d.size, b.size) )
 counter= 0
 
+
 for i in range(bafar,L1-bafar):
     for j in range(bafar,L2-bafar):
         if not test_fixed(i*L2+j):
@@ -162,6 +180,12 @@ for i in range(bafar,L1-bafar):
             counter+=1
         else:
             nu[i-bafar][j-bafar]=test_g(i*L2+j)
+        
+off=nu[0][0]
+for i in range(0,L1-0):
+    for j in range(0,L2-0):
+        x,y=test_xy(i*L2+j)
+        #nu[i][j]-=off+x*x*y*y+2*y
 
 X, Y = numpy.meshgrid(d, b)
 
