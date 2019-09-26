@@ -50,20 +50,20 @@ def thomasalgorithm(a,b,c,r):
     return x
 
 
-def cholskey(A):
-    r=[[0 for i in range(len(A)] for j in range(len(a))]
+def cholesky(A):
+    r=[[0 for i in range(len(A))] for j in range(len(A))]
     for i in range(0,len(A)):
-        for j in range(i,len(A):
+        for j in range(i,len(A)):
             if i==j:
                 s=0
                 for k in range(0,i):
                     s+=r[i][k]*r[i][k]
-                r[i][i]=math.sqrt(a[i][i]-s)
+                r[i][i]=math.sqrt(A[i][i]-s)
             else:
                 s=0
                 for k in range(0,i):
                     s+=r[i][k]*r[j][k]
-                r[j][i]=(a[i][j]-s)/r[i][i]
+                r[j][i]=(A[i][j]-s)/r[i][i]
     return r
 
 def gaussianelimination(A_,b_,scaledpartialpivot):
