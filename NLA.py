@@ -118,3 +118,14 @@ def gaussianelimination(A_,b_,scaledpartialpivot):
             s+=x[j]*A[i][j]
         x[i]=(b[i]-s)/A[i][i]
     return x
+
+if __name__ == "__main__":
+    A=[[2,0],[3,4]]
+    print("A=",A)
+    print("\ncholesky of A*A'  ",cholesky(product(A,transpose(A))))
+    
+    B=[5,8]
+    print("\nB=",B)
+    x=gaussianelimination(A,B,1)
+    print("\ngaussian elimination of Ax=B  x=",x)
+    print("Ax=",product(A,transpose([x])))
