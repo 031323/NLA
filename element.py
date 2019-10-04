@@ -53,8 +53,11 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                 B[node_map[triangle[i]]]-=area*numpy.dot(gradients[i],G_gradient)
     #print("A:\n",A,"\nB:\n",B)
     if n_free_nodes==len(mesh.nodes):
+        print("lstsq");
         return numpy.linalg.lstsq(A,B)[0]
-    else:return numpy.linalg.solve(A,B)
+    else:
+        print("solve")
+        return numpy.linalg.solve(A,B)
     #A=numpy.delete(A,0,0)
     #A=numpy.delete(A,0,1)
     #B=numpy.delete(B,0,0)
@@ -66,8 +69,8 @@ class mesh:
     triangles=[]
 
 test_mesh=mesh()
-L1=20
-L2=20
+L1=60+1
+L2=60+1
 for i in range(0,L1):
     for j in range(0,L2):
         test_mesh.nodes.append([i/(L1-1),j/(L2-1)])
@@ -110,7 +113,7 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    return -1.3333333
+    return 4
     return -2*x*x-2*y*y
     if x>y:
         return 1
@@ -124,9 +127,12 @@ def test_f(x,y):
 def test_xy(i):
     return test_mesh.nodes[i][0],test_mesh.nodes[i][1]
 def test_h(i,towards):
-    #return -1
+    return -1
     x,y=test_xy(i)
-    return (x-0.5)*(x-0.5)+(y-0.5)*(y-0.5)
+    if (x==0 or x==1) and (y==0 or y==1):
+        return 0
+    else:return -1
+    return x*(1-x)+y*(1-y)
     if i<L2:
         return 0
     elif (i+1)%L2==0:
