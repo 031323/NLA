@@ -126,6 +126,6 @@ if __name__ == "__main__":
     
     B=[5,8]
     print("\nB=",B)
-    x=gaussianelimination(A,B,1)
-    print("\ngaussian elimination of Ax=B  x=",x)
+    x=gaussianelimination(A,B,True)
+    print("\ngaussian elimination(spp) of Ax=B  x=",x)
     print("Ax=",product(A,transpose([x])))
