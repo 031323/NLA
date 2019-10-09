@@ -35,8 +35,7 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                     dL=numpy.linalg.norm(numpy.subtract(solute[i][:2],solute[j][:2]))
                     if not fixed(triangle[i]):B[node_map[triangle[i]]]+=(h(triangle[i],triangle[j])/2+h(triangle[j],triangle[i])/2)/2*dL
                     if not fixed(triangle[j]):B[node_map[triangle[j]]]+=(h(triangle[j],triangle[i])/2+h(triangle[i],triangle[j])/2)/2*dL
-                
-        area=abs(numpy.cross(numpy.subtract(solute[1][:2],solute[0][:2]),numpy.subtract(solute[2][:2],solute[0][:2])))/2
+        
         centroid=[(solute[0][0]+solute[1][0]+solute[2][0])/3,(solute[0][1]+solute[1][1]+solute[2][1])/3]
         #print("centroid:",centroid)
         #print("solute:",solute)
@@ -69,8 +68,8 @@ class mesh:
     triangles=[]
 
 test_mesh=mesh()
-L1=60+1
-L2=60+1
+L1=17
+L2=17
 for i in range(0,L1):
     for j in range(0,L2):
         test_mesh.nodes.append([i/(L1-1),j/(L2-1)])
@@ -79,11 +78,15 @@ for i in range(0,L1):
             v01=L2*(i-1)+j
             v11=L2*i+j
             v10=L2*i+j-1
-            test_mesh.triangles+=[[v00,v01,v11],[v00,v11,v10]]
+            if len(test_mesh.nodes)%2==0:
+            #if (i==1 and j==L2-1) or (i==L1-1 and j==1):
+                test_mesh.triangles+=[[v00,v01,v10],[v10,v11,v01]]
+            else:
+                test_mesh.triangles+=[[v00,v01,v11],[v00,v11,v10]]
 def test_boundary(i):
     return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    if i==0:return 1
+    if i<L2:return 1
     else:return 0
     #if i==L2/2 or i==L2/2-1 :return 1
     #else:return 0
@@ -100,7 +103,7 @@ def test_fixed(i):
     else:
         return 0
 def test_g(i):
-    return 0
+    return 0#i/(L2-1)
     if i<L2:
         return i/L2
     elif (i+1)%L2==0:
@@ -113,8 +116,8 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    return 4
-    return -2*x*x-2*y*y
+    return 3
+    #return -2*x*x-2*y*y
     if x>y:
         return 1
     else:
@@ -129,10 +132,10 @@ def test_xy(i):
 def test_h(i,towards):
     return -1
     x,y=test_xy(i)
-    if (x==0 or x==1) and (y==0 or y==1):
-        return 0
-    else:return -1
-    return x*(1-x)+y*(1-y)
+    #if (x==0 or x==1) and (y==0 or y==1):
+    #    return 0
+    #else:return -1
+    #return x*(1-x)+y*(1-y)
     if i<L2:
         return 0
     elif (i+1)%L2==0:
@@ -200,4 +203,10 @@ ax = fig.add_subplot(111, projection='3d')
 ax.set_proj_type('persp')
 ax.plot_surface(Y, X, nu,cmap=cm.RdBu)
 plt.show()
+
+def X(x1,x2):
+    for i in range(len(x1)):
+        for j in range(len(x1)):
+            if abs(x1[i][j]-x2[i*2][j*2])<0.0001:
+                print(i,j)
 

@@ -109,7 +109,7 @@ def gaussianelimination(A_,b_,scaledpartialpivot):
             for j_ in range(0,n):
                 A[i][j_]-=m*A[j][j_]
             b[i]-=m*b[j]
-    if A[i][i]==0:
+    if A[n][n]==0:
         raise ValueError
     x=[0]*n
     for i in range(n-1,-1,-1):
