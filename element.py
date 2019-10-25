@@ -68,11 +68,13 @@ class mesh:
     triangles=[]
 
 test_mesh=mesh()
-L1=17
-L2=17
+l1=2
+l2=1
+L1=41
+L2=21
 for i in range(0,L1):
     for j in range(0,L2):
-        test_mesh.nodes.append([i/(L1-1),j/(L2-1)])
+        test_mesh.nodes.append([i/(L1-1)*l1,j/(L2-1)*l2])
         if (i!=0) and (j!=0):
             v00=L2*(i-1)+j-1
             v01=L2*(i-1)+j
@@ -86,6 +88,7 @@ for i in range(0,L1):
 def test_boundary(i):
     return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
+    return 0
     if i<L2:return 1
     else:return 0
     #if i==L2/2 or i==L2/2-1 :return 1
@@ -175,8 +178,8 @@ from matplotlib import cm
 from mpl_toolkits import mplot3d
 
 bafar=0
-b = numpy.arange(0, 1, 1/L2)
-d = numpy.arange(0, 1, 1/L1)
+b = numpy.arange(0, l2+l2/(L2), l2/(L2-1))
+d = numpy.arange(0, l1+l1/(L1), l1/(L1-1))
 
 nu = numpy.zeros( (d.size, b.size) )
 counter= 0
@@ -196,7 +199,7 @@ for i in range(0,L1-0):
         x,y=test_xy(i*L2+j)
         #nu[i][j]-=off+x*x*y*y+2*y
 
-X, Y = numpy.meshgrid(d, b)
+X, Y = numpy.meshgrid(b, d)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
@@ -204,9 +207,9 @@ ax.set_proj_type('persp')
 ax.plot_surface(Y, X, nu,cmap=cm.RdBu)
 plt.show()
 
-def X(x1,x2):
+def XC(x1,x2):
     for i in range(len(x1)):
-        for j in range(len(x1)):
+        for j in range(len(x1[0])):
             if abs(x1[i][j]-x2[i*2][j*2])<0.0001:
                 print(i,j)
 
