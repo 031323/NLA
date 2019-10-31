@@ -62,29 +62,39 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
     #B=numpy.delete(B,0,0)
     #x=numpy.linalg.solve(A,B)
     #return numpy.concatenate((numpy.zeros(1),x))
-    
+
 class mesh:
     nodes=[]
     triangles=[]
 
 test_mesh=mesh()
-l1=2
+degree=1
+l1=1
 l2=1
-L1=41
+L1=21
 L2=21
+n_elements=0
 for i in range(0,L1):
     for j in range(0,L2):
         test_mesh.nodes.append([i/(L1-1)*l1,j/(L2-1)*l2])
-        if (i!=0) and (j!=0):
-            v00=L2*(i-1)+j-1
-            v01=L2*(i-1)+j
-            v11=L2*i+j
-            v10=L2*i+j-1
-            if len(test_mesh.nodes)%2==0:
-            #if (i==1 and j==L2-1) or (i==L1-1 and j==1):
-                test_mesh.triangles+=[[v00,v01,v10],[v10,v11,v01]]
-            else:
-                test_mesh.triangles+=[[v00,v01,v11],[v00,v11,v10]]
+        if (i!=0) and (j!=0) and (i%degree==0) and (j%degree==0):
+            n_elements+=1
+            t1=[]
+            t2=[]
+            for i_ in range(i-degree,i+1):
+                for j_ in range(j-degree,j+1):
+                    node=L2*i_+j_
+                    if (n_elements+int((n_elements-1)/(L2-1)))%2==0:
+                        if (i-i_+j-j_>=degree):
+                            t1+=[node]
+                        if (i-i_+j-j_<=degree):
+                            t2+=[node]
+                    else:
+                        if (i-i_<=j-j_):
+                            t1+=[node]
+                        if (i-i_>=j-j_):
+                            t2+=[node]
+            mesh.triangles+=[t1,t2]
 def test_boundary(i):
     return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
@@ -119,7 +129,7 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    return 3
+    return 4
     #return -2*x*x-2*y*y
     if x>y:
         return 1
