@@ -2,7 +2,31 @@ import numpy
 import math
 A=None
 B=None
-def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
+def pxy(degree,c,x,y):
+    sum=0
+    i=0
+    for j in range(0,degree+1):
+        for k in range(0,j+1):
+            sum+=c[i]*pow(x,j-k)*pow(y,k)
+            i+=1
+    return sum
+def dx_pxy(degree,c,x,y):
+    sum=0
+    for j in range(0,degree+1):
+        for k in range(0,j+1):
+            sum+=c[i]*(j-k)*pow(x,j-k-1)*pow(y,k)
+            i+=1
+    return sum
+
+def dy_pxy(degree,c,x,y):
+    sum=0
+    for j in range(0,degree+1):
+        for k in range(0,j+1):
+            sum+=c[i]*(k)*pow(x,j-k)*pow(y,k-1)
+            i+=1
+    return sum
+
+def homogenousdirichlet(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
     node_map=[]
     n_free_nodes=0
     for i in range(0,len(mesh.nodes)):
@@ -15,44 +39,17 @@ def homogenousdirichlet(mesh,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
     A=numpy.zeros((n_free_nodes,n_free_nodes))
     B=numpy.zeros(n_free_nodes);
     for triangle in mesh.triangles:
-        gradients=[]
-        solute=[]
-        for i in range(0,3):
-            solute.append(mesh.nodes[triangle[i]]+[1])
-        for i in range(0,3):
-            basis=[0]*3
-            basis[i]=1
-            gradients.append(numpy.linalg.solve(numpy.matrix(solute),numpy.array(basis))[:2])
-        area=abs(numpy.cross(numpy.subtract(solute[1][:2],solute[0][:2]),numpy.subtract(solute[2][:2],solute[0][:2])))/2
-        for i in range(0,3):
-            for j in range(i,3):
-                if not(fixed(triangle[i]) or fixed(triangle[j])):
-                    addition=numpy.dot(gradients[i],gradients[j])*area;
-                    A[node_map[triangle[i]],node_map[triangle[j]]]+=addition
-                    if i!=j:
-                        A[node_map[triangle[j]],node_map[triangle[i]]]+=addition
-                if (i!=j) and boundary(triangle[i]) and boundary(triangle[j]) and (not(fixed(triangle[i]) and fixed(triangle[j]))):
-                    dL=numpy.linalg.norm(numpy.subtract(solute[i][:2],solute[j][:2]))
-                    if not fixed(triangle[i]):B[node_map[triangle[i]]]+=(h(triangle[i],triangle[j])/2+h(triangle[j],triangle[i])/2)/2*dL
-                    if not fixed(triangle[j]):B[node_map[triangle[j]]]+=(h(triangle[j],triangle[i])/2+h(triangle[i],triangle[j])/2)/2*dL
-        
-        centroid=[(solute[0][0]+solute[1][0]+solute[2][0])/3,(solute[0][1]+solute[1][1]+solute[2][1])/3]
-        #print("centroid:",centroid)
-        #print("solute:",solute)
-        for vertex in triangle:
-            if fixed(vertex):
-                continue
-            B[node_map[vertex]]+=area*f(centroid[0],centroid[1])/3
-        G_gradient=numpy.zeros(2)
-        for i in range(0,3):
-            if fixed(triangle[i]):
-                G_gradient=numpy.add(G_gradient,g(triangle[i])*gradients[i])
-        for i in range(0,3):
-            if not fixed(triangle[i]):
-                B[node_map[triangle[i]]]-=area*numpy.dot(gradients[i],G_gradient)
+        M=[]
+        for node in triangle:
+            [x,y]=mesh.nodes[node]
+            Mi=[]
+            for j in range(0,degree+1):
+                for k in range(0,j+1):
+                    Mi.append(pow(x,j-k)*pow(y,k))
+            M.append(Mi)
     #print("A:\n",A,"\nB:\n",B)
     if n_free_nodes==len(mesh.nodes):
-        print("lstsq");
+        print("lstsq")
         return numpy.linalg.lstsq(A,B)[0]
     else:
         print("solve")
@@ -68,11 +65,11 @@ class mesh:
     triangles=[]
 
 test_mesh=mesh()
-degree=1
+degree=2
 l1=1
 l2=1
-L1=21
-L2=21
+L1=1*degree*2+1
+L2=1*degree*2+1
 n_elements=0
 for i in range(0,L1):
     for j in range(0,L2):
@@ -181,7 +178,7 @@ def test_h(i,towards):
         return -1
     return i*(L2-1-i)/L2/L2*10
 
-solve=homogenousdirichlet(test_mesh,test_boundary,test_f,test_fixed,test_g,test_h)
+solve=homogenousdirichlet(test_mesh,degree,test_boundary,test_f,test_fixed,test_g,test_h)
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
