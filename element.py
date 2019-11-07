@@ -12,6 +12,7 @@ def pxy(degree,c,x,y):
     return sum
 def dx_pxy(degree,c,x,y):
     sum=0
+    i=0
     for j in range(0,degree+1):
         for k in range(0,j+1):
             sum+=c[i]*(j-k)*pow(x,j-k-1)*pow(y,k)
@@ -20,6 +21,7 @@ def dx_pxy(degree,c,x,y):
 
 def dy_pxy(degree,c,x,y):
     sum=0
+    i=0
     for j in range(0,degree+1):
         for k in range(0,j+1):
             sum+=c[i]*(k)*pow(x,j-k)*pow(y,k-1)
@@ -40,12 +42,19 @@ gq1d=[
 ]
 
 gq2d=[
- 
+
+[[[0.333333,0.333333,0.333333],1]],
+
+[[[0.6666666,0.1666666,0.1666666],0.3333333],
+[[0.1666666,0.6666666,0.1666666],0.3333333],
+[[0.1666666,0.1666666,0.6666666],0.3333333]]
+
 ]
 
 
 def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
     node_map=[]
+    #global n_free_nodes
     n_free_nodes=0
     for i in range(0,len(mesh.nodes)):
         if fixed(i):
@@ -53,6 +62,7 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
         else:
             node_map.append(n_free_nodes)
             n_free_nodes+=1
+    global A,B
     A=numpy.zeros((n_free_nodes,n_free_nodes))
     B=numpy.zeros(n_free_nodes);
     for tn,triangle in enumerate(mesh.triangles):
@@ -68,14 +78,65 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
             M.append(Mi)
         ce=numpy.linalg.inv(M)
         for i in range(0,len(triangle)):
-            for j in range(0,len(triangle)):
-                if fixed(i) or fixed(j):continue
+            for j in range(i,len(triangle)):
+                if fixed(triangle[i]) or fixed(triangle[j]):
+                    continue
                 integration=0
+                p=2*degree-2
+                quadratures=gq2d[p-1]
+                for k in range(0,len(quadratures)):
+                    x=0
+                    y=0
+                    for l in range(0,3):
+                        x+=v[l][0]*quadratures[k][0][l]
+                        y+=v[l][1]*quadratures[k][0][l]
+                    integration+=area*quadratures[k][1]*\
+                    (dx_pxy(degree,ce[:,i],x,y)*dx_pxy(degree,ce[:,j],x,y)+dy_pxy(degree,ce[:,i],x,y)*dy_pxy(degree,ce[:,j],x,y))
+                    
                 A[node_map[triangle[i]],node_map[triangle[j]]]+=integration
                 if i!=j:
                     A[node_map[triangle[j]],node_map[triangle[i]]]+=integration
+        
         for i in range(0,len(triangle)):
-            pass
+            if fixed(triangle[i]):continue
+            integration=0
+            p=degree
+            quadratures=gq2d[p-1]
+            for k in range(0,len(quadratures)):
+                x=0
+                y=0
+                for l in range(0,3):
+                    x+=v[l][0]*quadratures[k][0][l]
+                    y+=v[l][1]*quadratures[k][0][l]
+                integration+=area*quadratures[k][1]*pxy(degree,ce[:,i],x,y)*f(x,y)
+            
+            p=2*degree-2
+            quadratures=gq2d[p-1]
+            for j in range(0,len(triangle)):
+                if not fixed(triangle[j]):continue
+                for k in range(0,len(quadratures)):
+                    x=0
+                    y=0
+                    for l in range(0,3):
+                        x+=v[l][0]*quadratures[k][0][l]
+                        y+=v[l][1]*quadratures[k][0][l]
+                    integration-=g(triangle[j])*area*quadratures[k][1]*\
+                    (dx_pxy(degree,ce[:,i],x,y)*dx_pxy(degree,ce[:,j],x,y)+dy_pxy(degree,ce[:,i],x,y)*dy_pxy(degree,ce[:,j],x,y))
+                    
+            if(boundary(triangle[i])):
+                for a in range(0,3):
+                    for b in range(a,3):
+                        if a==b or (not boundary(mesh.triangle_vertices[tn][a])) or (not boundary(mesh.triangle_vertices[tn][b])):continue
+                        if  fixed(mesh.triangle_vertices[tn][a]) and fixed(mesh.triangle_vertices[tn][b]):continue
+                        length=math.sqrt(pow(v[a][0]-v[b][0],2)+pow(v[a][1]-v[b][1],2))
+                        n=math.ceil((degree+1)/2)
+                        quadratures=gq1d[n-1]
+                        for k in range(0,len(quadratures)):
+                            x=(v[a][0]*(1-quadratures[k][0])+v[b][0]*(1+quadratures[k][0]))/2
+                            y=(v[a][1]*(1-quadratures[k][0])+v[b][1]*(1+quadratures[k][0]))/2
+                            integration+=length*quadratures[k][1]/2*pxy(degree,ce[:,i],x,y)*h(x,y)
+                    
+            B[node_map[triangle[i]]]+=integration
                     
     #print("A:\n",A,"\nB:\n",B)
     if n_free_nodes==len(mesh.nodes):
@@ -99,8 +160,8 @@ test_mesh=mesh()
 degree=2
 l1=1
 l2=1
-L1=1*degree*2+1
-L2=1*degree*2+1
+L1=10*degree*2+1
+L2=10*degree*2+1
 n_elements=0
 for i in range(0,L1):
     for j in range(0,L2):
@@ -135,7 +196,7 @@ for i in range(0,L1):
 def test_boundary(i):
     return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    return 0
+    #return 0
     if i<L2:return 1
     else:return 0
     #if i==L2/2 or i==L2/2-1 :return 1
@@ -153,7 +214,7 @@ def test_fixed(i):
     else:
         return 0
 def test_g(i):
-    return 0#i/(L2-1)
+    return i/(L2-1)
     if i<L2:
         return i/L2
     elif (i+1)%L2==0:
