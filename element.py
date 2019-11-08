@@ -100,7 +100,7 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
         for i in range(0,len(triangle)):
             if fixed(triangle[i]):continue
             integration=0
-            p=degree
+            p=degree #TODO: p=2*degree
             quadratures=gq2d[p-1]
             for k in range(0,len(quadratures)):
                 x=0
@@ -109,6 +109,8 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                     x+=v[l][0]*quadratures[k][0][l]
                     y+=v[l][1]*quadratures[k][0][l]
                 integration+=area*quadratures[k][1]*pxy(degree,ce[:,i],x,y)*f(x,y)
+            
+            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
             
             p=2*degree-2
             quadratures=gq2d[p-1]
@@ -122,7 +124,9 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                         y+=v[l][1]*quadratures[k][0][l]
                     integration-=g(triangle[j])*area*quadratures[k][1]*\
                     (dx_pxy(degree,ce[:,i],x,y)*dx_pxy(degree,ce[:,j],x,y)+dy_pxy(degree,ce[:,i],x,y)*dy_pxy(degree,ce[:,j],x,y))
-                    
+            
+            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
+            
             if(boundary(triangle[i])):
                 for a in range(0,3):
                     for b in range(a,3):
@@ -135,7 +139,8 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                             x=(v[a][0]*(1-quadratures[k][0])+v[b][0]*(1+quadratures[k][0]))/2
                             y=(v[a][1]*(1-quadratures[k][0])+v[b][1]*(1+quadratures[k][0]))/2
                             integration+=length*quadratures[k][1]/2*pxy(degree,ce[:,i],x,y)*h(x,y)
-                    
+            
+            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
             B[node_map[triangle[i]]]+=integration
                     
     #print("A:\n",A,"\nB:\n",B)
@@ -151,6 +156,7 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
     #x=numpy.linalg.solve(A,B)
     #return numpy.concatenate((numpy.zeros(1),x))
 
+
 class mesh:
     nodes=[]
     triangles=[]
@@ -160,15 +166,16 @@ test_mesh=mesh()
 degree=2
 l1=1
 l2=1
-L1=10*degree*2+1
-L2=10*degree*2+1
-n_elements=0
+L1=5*degree*2+1
+L2=5*degree*2+1
+n_elements2=0
 for i in range(0,L1):
     for j in range(0,L2):
         test_mesh.nodes.append([i/(L1-1)*l1,j/(L2-1)*l2])
         if (i!=0) and (j!=0) and (i%degree==0) and (j%degree==0):
-            n_elements+=1
-            F2=((n_elements+int((n_elements-1)/(L2-1)))%2==0)
+            n_elements2+=1
+            F2=((n_elements2+int((n_elements2-1)*degree/(L2-1)))%2==0)
+            print([n_elements2,(n_elements2-1)*degree,L2-1,int((n_elements2-1)*degree/(L2-1)),(n_elements2+int((n_elements2-1)*degree/(L2-1))),F2])
             t1=[]
             t2=[]
             for i_ in range(i-degree,i+1):
@@ -227,12 +234,12 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    return 4
+    return 0
     #return -2*x*x-2*y*y
     if x>y:
-        return 1
+        return 40
     else:
-        return -1
+        return -40
     #return (x-L1/2)*1+(y-L2/2)*4
     if x>L1/2:
         return 1
@@ -241,7 +248,7 @@ def test_f(x,y):
 def test_xy(i):
     return test_mesh.nodes[i][0],test_mesh.nodes[i][1]
 def test_h(i,towards):
-    return -1
+    return 10
     x,y=test_xy(i)
     #if (x==0 or x==1) and (y==0 or y==1):
     #    return 0
