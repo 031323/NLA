@@ -12,6 +12,7 @@ def pxy(degree,c,x,y):
     return sum
 def dx_pxy(degree,c,x,y):
     sum=0
+    i=0
     for j in range(0,degree+1):
         for k in range(0,j+1):
             sum+=c[i]*(j-k)*pow(x,j-k-1)*pow(y,k)
@@ -20,14 +21,40 @@ def dx_pxy(degree,c,x,y):
 
 def dy_pxy(degree,c,x,y):
     sum=0
+    i=0
     for j in range(0,degree+1):
         for k in range(0,j+1):
             sum+=c[i]*(k)*pow(x,j-k)*pow(y,k-1)
             i+=1
     return sum
 
-def homogenousdirichlet(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
+gq1d=[
+
+[[0,2]],
+
+[[0.57735,1],
+[-0.57735,1]],
+
+[[0,0.888888],
+[0.774597,0.555555],
+[-0.774597,0.555555]]
+
+]
+
+gq2d=[
+
+[[[0.333333,0.333333,0.333333],1]],
+
+[[[0.6666666,0.1666666,0.1666666],0.3333333],
+[[0.1666666,0.6666666,0.1666666],0.3333333],
+[[0.1666666,0.1666666,0.6666666],0.3333333]]
+
+]
+
+
+def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
     node_map=[]
+    #global n_free_nodes
     n_free_nodes=0
     for i in range(0,len(mesh.nodes)):
         if fixed(i):
@@ -38,7 +65,9 @@ def homogenousdirichlet(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
     global A,B
     A=numpy.zeros((n_free_nodes,n_free_nodes))
     B=numpy.zeros(n_free_nodes);
-    for triangle in mesh.triangles:
+    for tn,triangle in enumerate(mesh.triangles):
+        v=[mesh.nodes[mesh.triangle_vertices[tn][0]],mesh.nodes[mesh.triangle_vertices[tn][1]],mesh.nodes[mesh.triangle_vertices[tn][2]]]
+        area=abs(numpy.cross(numpy.subtract(v[1],v[0]),numpy.subtract(v[2],v[0])))*0.5
         M=[]
         for node in triangle:
             [x,y]=mesh.nodes[node]
@@ -47,6 +76,73 @@ def homogenousdirichlet(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                 for k in range(0,j+1):
                     Mi.append(pow(x,j-k)*pow(y,k))
             M.append(Mi)
+        ce=numpy.linalg.inv(M)
+        for i in range(0,len(triangle)):
+            for j in range(i,len(triangle)):
+                if fixed(triangle[i]) or fixed(triangle[j]):
+                    continue
+                integration=0
+                p=2*degree-2
+                quadratures=gq2d[p-1]
+                for k in range(0,len(quadratures)):
+                    x=0
+                    y=0
+                    for l in range(0,3):
+                        x+=v[l][0]*quadratures[k][0][l]
+                        y+=v[l][1]*quadratures[k][0][l]
+                    integration+=area*quadratures[k][1]*\
+                    (dx_pxy(degree,ce[:,i],x,y)*dx_pxy(degree,ce[:,j],x,y)+dy_pxy(degree,ce[:,i],x,y)*dy_pxy(degree,ce[:,j],x,y))
+                    
+                A[node_map[triangle[i]],node_map[triangle[j]]]+=integration
+                if i!=j:
+                    A[node_map[triangle[j]],node_map[triangle[i]]]+=integration
+        
+        for i in range(0,len(triangle)):
+            if fixed(triangle[i]):continue
+            integration=0
+            p=degree #TODO: p=2*degree
+            quadratures=gq2d[p-1]
+            for k in range(0,len(quadratures)):
+                x=0
+                y=0
+                for l in range(0,3):
+                    x+=v[l][0]*quadratures[k][0][l]
+                    y+=v[l][1]*quadratures[k][0][l]
+                integration+=area*quadratures[k][1]*pxy(degree,ce[:,i],x,y)*f(x,y)
+            
+            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
+            
+            p=2*degree-2
+            quadratures=gq2d[p-1]
+            for j in range(0,len(triangle)):
+                if not fixed(triangle[j]):continue
+                for k in range(0,len(quadratures)):
+                    x=0
+                    y=0
+                    for l in range(0,3):
+                        x+=v[l][0]*quadratures[k][0][l]
+                        y+=v[l][1]*quadratures[k][0][l]
+                    integration-=g(triangle[j])*area*quadratures[k][1]*\
+                    (dx_pxy(degree,ce[:,i],x,y)*dx_pxy(degree,ce[:,j],x,y)+dy_pxy(degree,ce[:,i],x,y)*dy_pxy(degree,ce[:,j],x,y))
+            
+            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
+            
+            if(boundary(triangle[i])):
+                for a in range(0,3):
+                    for b in range(a,3):
+                        if a==b or (not boundary(mesh.triangle_vertices[tn][a])) or (not boundary(mesh.triangle_vertices[tn][b])):continue
+                        if  fixed(mesh.triangle_vertices[tn][a]) and fixed(mesh.triangle_vertices[tn][b]):continue
+                        length=math.sqrt(pow(v[a][0]-v[b][0],2)+pow(v[a][1]-v[b][1],2))
+                        n=math.ceil((degree+1)/2)
+                        quadratures=gq1d[n-1]
+                        for k in range(0,len(quadratures)):
+                            x=(v[a][0]*(1-quadratures[k][0])+v[b][0]*(1+quadratures[k][0]))/2
+                            y=(v[a][1]*(1-quadratures[k][0])+v[b][1]*(1+quadratures[k][0]))/2
+                            integration+=length*quadratures[k][1]/2*pxy(degree,ce[:,i],x,y)*h(x,y)
+            
+            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
+            B[node_map[triangle[i]]]+=integration
+                    
     #print("A:\n",A,"\nB:\n",B)
     if n_free_nodes==len(mesh.nodes):
         print("lstsq")
@@ -60,28 +156,32 @@ def homogenousdirichlet(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
     #x=numpy.linalg.solve(A,B)
     #return numpy.concatenate((numpy.zeros(1),x))
 
+
 class mesh:
     nodes=[]
     triangles=[]
+    triangle_vertices=[]
 
 test_mesh=mesh()
 degree=2
 l1=1
 l2=1
-L1=1*degree*2+1
-L2=1*degree*2+1
-n_elements=0
+L1=5*degree*2+1
+L2=5*degree*2+1
+n_elements2=0
 for i in range(0,L1):
     for j in range(0,L2):
         test_mesh.nodes.append([i/(L1-1)*l1,j/(L2-1)*l2])
         if (i!=0) and (j!=0) and (i%degree==0) and (j%degree==0):
-            n_elements+=1
+            n_elements2+=1
+            F2=((n_elements2+int((n_elements2-1)*degree/(L2-1)))%2==0)
+            print([n_elements2,(n_elements2-1)*degree,L2-1,int((n_elements2-1)*degree/(L2-1)),(n_elements2+int((n_elements2-1)*degree/(L2-1))),F2])
             t1=[]
             t2=[]
             for i_ in range(i-degree,i+1):
                 for j_ in range(j-degree,j+1):
                     node=L2*i_+j_
-                    if (n_elements+int((n_elements-1)/(L2-1)))%2==0:
+                    if F2:
                         if (i-i_+j-j_>=degree):
                             t1+=[node]
                         if (i-i_+j-j_<=degree):
@@ -92,10 +192,18 @@ for i in range(0,L1):
                         if (i-i_>=j-j_):
                             t2+=[node]
             mesh.triangles+=[t1,t2]
+            v00=L2*(i-degree)+j-degree
+            v01=L2*(i-degree)+j
+            v11=L2*i+j
+            v10=L2*i+j-degree
+            if F2:
+                mesh.triangle_vertices+=[[v00,v01,v10],[v10,v11,v01]]
+            else:
+                mesh.triangle_vertices+=[[v00,v11,v10],[v00,v01,v11]]
 def test_boundary(i):
     return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    return 0
+    #return 0
     if i<L2:return 1
     else:return 0
     #if i==L2/2 or i==L2/2-1 :return 1
@@ -113,7 +221,7 @@ def test_fixed(i):
     else:
         return 0
 def test_g(i):
-    return 0#i/(L2-1)
+    return i/(L2-1)
     if i<L2:
         return i/L2
     elif (i+1)%L2==0:
@@ -126,12 +234,12 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    return 4
+    return 0
     #return -2*x*x-2*y*y
     if x>y:
-        return 1
+        return 40
     else:
-        return -1
+        return -40
     #return (x-L1/2)*1+(y-L2/2)*4
     if x>L1/2:
         return 1
@@ -140,7 +248,7 @@ def test_f(x,y):
 def test_xy(i):
     return test_mesh.nodes[i][0],test_mesh.nodes[i][1]
 def test_h(i,towards):
-    return -1
+    return 10
     x,y=test_xy(i)
     #if (x==0 or x==1) and (y==0 or y==1):
     #    return 0
@@ -178,7 +286,7 @@ def test_h(i,towards):
         return -1
     return i*(L2-1-i)/L2/L2*10
 
-solve=homogenousdirichlet(test_mesh,degree,test_boundary,test_f,test_fixed,test_g,test_h)
+solve=solve(test_mesh,degree,test_boundary,test_f,test_fixed,test_g,test_h)
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
