@@ -1,5 +1,6 @@
 import copy
 import math
+import numpy
 def innerproduct(a,b):
 	if len(a)!=len(b):
 		raise ValueError
