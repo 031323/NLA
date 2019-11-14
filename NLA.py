@@ -131,9 +131,97 @@ def givens_parameters(a,b):
         t=a/b
         c=1/math.sqrt(1+t*t)
         s=c*t
+    print(c,s)
     return c,s
-#def givens(A):
+    
+def givens_multiplier(A,i,j,c,s):
+    A_=numpy.array(A,dtype=numpy.float)
+    a=A_[i,:].copy()
+    b=A_[j,:].copy()
+    A_[i,:]=c*a+s*b
+    A_[j,:]=-s*a+c*b
+    return A_.tolist()
+def givens(A_):
+    A=copy.deepcopy(A_)
+    m=len(A)
+    n=len(A[0])
+    Q=[[0 for i in range(m)] for j in range(m)]
+    for i in range(m):Q[i][i]=1
+    for i in range(0,min(m-1,n)):
+        for j in range(i+1,m):
+            c,s=givens_parameters(A[j][i],A[i][i])
+            A=givens_multiplier(A,i,j,c,s)
+            Q=givens_multiplier(Q,i,j,c,s)
+    return transpose(Q),A
 
+def jacobi(A_,b_,iterations,threshold):
+    A=copy.deepcopy(A_)
+    b=copy.deepcopy(b_)
+    n=len(b)
+    x=[0]*n
+    x2=[0]*n
+    K=0
+    t=threshold
+    for k in range(iterations):
+        K+=1
+        for i in range(n):
+            sum=b[i]
+            for j in range(n):
+                if j!=i:
+                    sum-=A[i][j]*x[j]
+            x2[i]=sum/A[i][i]
+        x=x2.copy()
+        t=numpy.linalg.norm(numpy.array(b)-numpy.array(A)@numpy.array(x))/numpy.linalg.norm(numpy.array(b))
+        if t<threshold:break
+       
+    return x,K,t
+
+def gauss_siedel(A_,b_,iterations,threshold):
+    A=copy.deepcopy(A_)
+    b=copy.deepcopy(b_)
+    n=len(b)
+    x=[0]*n
+    K=0
+    t=threshold
+    for k in range(iterations):
+        K+=1
+        for i in range(n):
+            sum=b[i]
+            for j in range(n):
+                if j!=i:
+                    sum-=A[i][j]*x[j]
+            x[i]=sum/A[i][i]
+        t=numpy.linalg.norm(numpy.array(b)-numpy.array(A)@numpy.array(x))/numpy.linalg.norm(numpy.array(b))
+        if t<threshold:break
+    return x,K,t
+    
+def SOR(A_,b_,w,iterations,threshold):
+    A=copy.deepcopy(A_)
+    b=copy.deepcopy(b_)
+    n=len(b)
+    x=[0]*n
+    x2=[0]*n
+    K=0
+    t=threshold
+    for k in range(iterations):
+        K+=1
+        for i in range(n):
+            sum=b[i]*w
+            for j in range(n):
+                if j!=i:
+                    sum-=w*A[i][j]*x2[j]
+            x2[i]=sum/A[i][i]+(1-w)*x[i]
+        x=x2.copy()
+        t=numpy.linalg.norm(numpy.array(b)-numpy.array(A)@numpy.array(x))/numpy.linalg.norm(numpy.array(b))
+        if t<threshold:break
+       
+    return x,K,t
+
+def pseudo_inverse(A):
+    return product(numpy.linalg.inv(product(transpose(A),A)).tolist(),transpose(A))
+    
+def condition_number(A):
+    pass
 
 if __name__ == "__main__":
     main()
@@ -147,3 +235,22 @@ def main():
     x=gaussianelimination(A,B,True)
     print("\ngaussian elimination(spp) of Ax=B  x=",x)
     print("Ax=",product(A,transpose([x])))
+
+    print("\nJacobi of Ax=B  x,iterations,error=",jacobi(A,B,10,0.0001))
+    print("\nGauss Siedel of Ax=B  x,iterations,error=",gauss_siedel(A,B,10,0.0001))
+    print("\nSOR of Ax=B  x,iterations,error=",SOR(A,B,1.2,100,0.0001))
+    
+    print("\nA=",A)
+    print("Givens of A:")
+    Q,R=givens(A)
+    print("Q:",Q)
+    print("R:",R)
+    print("QR:",product(Q,R))
+
+    A=[[1,6,1],[4,2,1],[0,3,5],[2,6,9],[-1,5,-8]]
+    print("\nA=:\n",numpy.array(A))
+    b=transpose([[2,12,5,4,7]])
+    print("\nb=:\n",numpy.array(b))
+    x=product(pseudo_inverse(A),b)
+    print("\nsolution of Ax=b using pseudo_inverse: x=:\n",numpy.array(x))
+    print("\nAx:\n",numpy.array(product(A,x)))
