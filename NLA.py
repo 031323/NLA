@@ -229,8 +229,6 @@ def condition_number(A):
     A1=pseudo_inverse(A)
     return math.sqrt(ro(product(A,transpose(A)))*ro(product(A1,transpose(A1))))
 
-if __name__ == "__main__":
-    main()
 def main():
     A=[[2,0],[3,4]]
     print("\nA=\n",numpy.array(A))
@@ -265,3 +263,6 @@ def main():
     print("\nLet A be a 6x4 Vandermonde matrix. A:\n",numpy.array(A))
     print("\nIts condition_number is: ",condition_number(A))
     print("As per matlab, 1.1733e+03\n")
+
+if __name__ == "__main__":
+    main()
