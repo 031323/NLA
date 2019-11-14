@@ -110,7 +110,7 @@ def gaussianelimination(A_,b_,scaledpartialpivot):
             for j_ in range(0,n):
                 A[i][j_]-=m*A[j][j_]
             b[i]-=m*b[j]
-    if A[n][n]==0:
+    if A[n-1][n-1]==0:
         raise ValueError
     x=[0]*n
     for i in range(n-1,-1,-1):
@@ -120,7 +120,24 @@ def gaussianelimination(A_,b_,scaledpartialpivot):
         x[i]=(b[i]-s)/A[i][i]
     return x
 
+def givens_parameters(a,b):
+    c,s=0,0
+    if a==0:c,s=1,0
+    elif abs(a)>abs(b):
+        t=b/a
+        s=1/math.sqrt(1+t*t)
+        c=s*t
+    else:
+        t=a/b
+        c=1/math.sqrt(1+t*t)
+        s=c*t
+    return c,s
+#def givens(A):
+
+
 if __name__ == "__main__":
+    main()
+def main():
     A=[[2,0],[3,4]]
     print("A=",A)
     print("\ncholesky of A*A'  ",cholesky(product(A,transpose(A))))
