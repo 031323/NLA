@@ -45,9 +45,35 @@ gq2d=[
 
 [[[0.333333,0.333333,0.333333],1]],
 
-[[[0.6666666,0.1666666,0.1666666],0.3333333],
-[[0.1666666,0.6666666,0.1666666],0.3333333],
-[[0.1666666,0.1666666,0.6666666],0.3333333]]
+[[[0.666666666666666,0.166666666666666,0.166666666666666],0.333333333333333],
+[[0.166666666666666,0.666666666666666,0.166666666666666],0.333333333333333],
+[[0.166666666666666,0.166666666666666,0.666666666666666],0.333333333333333]],
+
+[],
+
+[[[0.108103018168070,0.445948490915965,0.445948490915965],0.223381589678011],
+[[0.445948490915965,0.108103018168070,0.445948490915965],0.223381589678011],
+[[0.445948490915965,0.445948490915965,0.108103018168070],0.223381589678011],
+[[0.816847572980459,0.091576213509771,0.091576213509771],0.109951743655322],
+[[0.091576213509771,0.816847572980459,0.091576213509771],0.109951743655322],
+[[0.091576213509771,0.091576213509771,0.816847572980459],0.109951743655322]
+],
+
+[],
+
+[[[0.501426509658179,0.249286745170910,0.249286745170910],0.116786275726379],
+[[0.249286745170910,0.501426509658179,0.249286745170910],0.116786275726379],
+[[0.249286745170910,0.249286745170910,0.501426509658179],0.116786275726379],
+[[0.873821971016996,0.063089014491502,0.063089014491502],0.050844906370207],
+[[0.063089014491502,0.873821971016996,0.063089014491502],0.050844906370207],
+[[0.063089014491502,0.063089014491502,0.873821971016996],0.050844906370207],
+[[0.053145049844817,0.310352451033784,0.636502499121399],0.082851075618374],
+[[0.053145049844817,0.636502499121399,0.310352451033784],0.082851075618374],
+[[0.310352451033784,0.053145049844817,0.636502499121399],0.082851075618374],
+[[0.636502499121399,0.053145049844817,0.310352451033784],0.082851075618374],
+[[0.310352451033784,0.636502499121399,0.053145049844817],0.082851075618374],
+[[0.636502499121399,0.310352451033784,0.053145049844817],0.082851075618374]
+]
 
 ]
 
@@ -100,7 +126,7 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
         for i in range(0,len(triangle)):
             if fixed(triangle[i]):continue
             integration=0
-            p=degree #TODO: p=2*degree
+            p=2*degree
             quadratures=gq2d[p-1]
             for k in range(0,len(quadratures)):
                 x=0
@@ -110,7 +136,7 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                     y+=v[l][1]*quadratures[k][0][l]
                 integration+=area*quadratures[k][1]*pxy(degree,ce[:,i],x,y)*f(x,y)
             
-            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
+            #if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
             
             p=2*degree-2
             quadratures=gq2d[p-1]
@@ -125,7 +151,7 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                     integration-=g(triangle[j])*area*quadratures[k][1]*\
                     (dx_pxy(degree,ce[:,i],x,y)*dx_pxy(degree,ce[:,j],x,y)+dy_pxy(degree,ce[:,i],x,y)*dy_pxy(degree,ce[:,j],x,y))
             
-            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
+            #if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
             
             if(boundary(triangle[i])):
                 for a in range(0,3):
@@ -140,7 +166,7 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
                             y=(v[a][1]*(1-quadratures[k][0])+v[b][1]*(1+quadratures[k][0]))/2
                             integration+=length*quadratures[k][1]/2*pxy(degree,ce[:,i],x,y)*h(x,y)
             
-            if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
+            #if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
             B[node_map[triangle[i]]]+=integration
                     
     #print("A:\n",A,"\nB:\n",B)
@@ -163,11 +189,11 @@ class mesh:
     triangle_vertices=[]
 
 test_mesh=mesh()
-degree=2
+degree=3
 l1=1
 l2=1
-L1=5*degree*2+1
-L2=5*degree*2+1
+L1=2*degree*2+1
+L2=2*degree*2+1
 n_elements2=0
 for i in range(0,L1):
     for j in range(0,L2):
@@ -175,7 +201,7 @@ for i in range(0,L1):
         if (i!=0) and (j!=0) and (i%degree==0) and (j%degree==0):
             n_elements2+=1
             F2=((n_elements2+int((n_elements2-1)*degree/(L2-1)))%2==0)
-            print([n_elements2,(n_elements2-1)*degree,L2-1,int((n_elements2-1)*degree/(L2-1)),(n_elements2+int((n_elements2-1)*degree/(L2-1))),F2])
+            #print([n_elements2,(n_elements2-1)*degree,L2-1,int((n_elements2-1)*degree/(L2-1)),(n_elements2+int((n_elements2-1)*degree/(L2-1))),F2])
             t1=[]
             t2=[]
             for i_ in range(i-degree,i+1):
@@ -203,7 +229,7 @@ for i in range(0,L1):
 def test_boundary(i):
     return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    #return 0
+    return 0
     if i<L2:return 1
     else:return 0
     #if i==L2/2 or i==L2/2-1 :return 1
@@ -234,7 +260,7 @@ def test_g(i):
         #return i/L2/L1
         return 0
 def test_f(x,y):
-    return 0
+    return 4
     #return -2*x*x-2*y*y
     if x>y:
         return 40
@@ -248,7 +274,7 @@ def test_f(x,y):
 def test_xy(i):
     return test_mesh.nodes[i][0],test_mesh.nodes[i][1]
 def test_h(i,towards):
-    return 10
+    return -1
     x,y=test_xy(i)
     #if (x==0 or x==1) and (y==0 or y==1):
     #    return 0
