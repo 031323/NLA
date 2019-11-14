@@ -131,7 +131,6 @@ def givens_parameters(a,b):
         t=a/b
         c=1/math.sqrt(1+t*t)
         s=c*t
-    print(c,s)
     return c,s
     
 def givens_multiplier(A,i,j,c,s):
@@ -219,33 +218,40 @@ def SOR(A_,b_,w,iterations,threshold):
 
 def pseudo_inverse(A):
     return product(numpy.linalg.inv(product(transpose(A),A)).tolist(),transpose(A))
-    
+
+def ro(A):
+    eigenvalues=numpy.linalg.eigvals(A)
+    for i in range(len(eigenvalues)):
+        eigenvalues[i]=abs(eigenvalues[i])
+    return abs(max(eigenvalues))
+
 def condition_number(A):
-    pass
+    A1=pseudo_inverse(A)
+    return math.sqrt(ro(product(A,transpose(A)))*ro(product(A1,transpose(A1))))
 
 if __name__ == "__main__":
     main()
 def main():
     A=[[2,0],[3,4]]
-    print("A=",A)
-    print("\ncholesky of A*A'  ",cholesky(product(A,transpose(A))))
+    print("\nA=\n",numpy.array(A))
+    print("\ncholesky of A*A'  \n",numpy.array(cholesky(product(A,transpose(A)))))
     
     B=[5,8]
     print("\nB=",B)
     x=gaussianelimination(A,B,True)
     print("\ngaussian elimination(spp) of Ax=B  x=",x)
-    print("Ax=",product(A,transpose([x])))
+    print("Ax=\n",numpy.array(product(A,transpose([x]))))
 
-    print("\nJacobi of Ax=B  x,iterations,error=",jacobi(A,B,10,0.0001))
-    print("\nGauss Siedel of Ax=B  x,iterations,error=",gauss_siedel(A,B,10,0.0001))
-    print("\nSOR of Ax=B  x,iterations,error=",SOR(A,B,1.2,100,0.0001))
+    print("\nJacobi of Ax=B  x,iterations,error=\n",(jacobi(A,B,10,0.0001)))
+    print("\nGauss Siedel of Ax=B  x,iterations,error=\n",(gauss_siedel(A,B,10,0.0001)))
+    print("\nSOR of Ax=B  x,iterations,error=\n",(SOR(A,B,1.2,100,0.0001)))
     
-    print("\nA=",A)
-    print("Givens of A:")
+    print("\nA=\n",numpy.array(A))
+    print("\nGivens of A:\n")
     Q,R=givens(A)
-    print("Q:",Q)
-    print("R:",R)
-    print("QR:",product(Q,R))
+    print("Q:\n",numpy.array(Q))
+    print("R:\n",numpy.array(R))
+    print("QR:\n",numpy.array(product(Q,R)))
 
     A=[[1,6,1],[4,2,1],[0,3,5],[2,6,9],[-1,5,-8]]
     print("\nA=:\n",numpy.array(A))
@@ -254,3 +260,8 @@ def main():
     x=product(pseudo_inverse(A),b)
     print("\nsolution of Ax=b using pseudo_inverse: x=:\n",numpy.array(x))
     print("\nAx:\n",numpy.array(product(A,x)))
+    
+    A=[[2,4,8,16],[3,8,27,81],[1,5,25,125],[4,16,64,256],[1,6,36,215],[1,7,49,343]]
+    print("\nLet A be a 6x4 Vandermonde matrix. A:\n",numpy.array(A))
+    print("\nIts condition_number is: ",condition_number(A))
+    print("As per matlab, 1.1733e+03\n")
