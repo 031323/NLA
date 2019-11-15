@@ -1,6 +1,7 @@
 import copy
 import math
 import numpy
+import time
 def innerproduct(a,b):
 	if len(a)!=len(b):
 		raise ValueError
@@ -164,13 +165,14 @@ def jacobi(A_,b_,iterations,threshold):
     for k in range(iterations):
         K+=1
         for i in range(n):
+            #if abs(x[i])>1000.0:print("\n\n\n\n",k,x[i])
             sum=b[i]
             for j in range(n):
                 if j!=i:
                     sum-=A[i][j]*x[j]
             x2[i]=sum/A[i][i]
         x=x2.copy()
-        t=numpy.linalg.norm(numpy.array(b)-numpy.array(A)@numpy.array(x))/numpy.linalg.norm(numpy.array(b))
+        t=numpy.linalg.norm(numpy.array(b)-numpy.array(A) @ numpy.array(x))/numpy.linalg.norm(numpy.array(b))
         if t<threshold:break
        
     return x,K,t
@@ -230,20 +232,25 @@ def condition_number(A):
     return math.sqrt(ro(product(A,transpose(A)))*ro(product(A1,transpose(A1))))
 
 def main():
-    A=[[2,0],[3,4]]
+    A=[[12,3,9,4],[0,19,5,8],[7,6,20,5],[1,6,3,12]]
     print("\nA=\n",numpy.array(A))
+
     print("\ncholesky of A*A'  \n",numpy.array(cholesky(product(A,transpose(A)))))
-    
-    B=[5,8]
+    B=[5,8,4,7]
     print("\nB=",B)
     x=gaussianelimination(A,B,True)
     print("\ngaussian elimination(spp) of Ax=B  x=",x)
     print("Ax=\n",numpy.array(product(A,transpose([x]))))
-
-    print("\nJacobi of Ax=B  x,iterations,error=\n",(jacobi(A,B,10,0.0001)))
-    print("\nGauss Siedel of Ax=B  x,iterations,error=\n",(gauss_siedel(A,B,10,0.0001)))
-    print("\nSOR of Ax=B  x,iterations,error=\n",(SOR(A,B,1.2,100,0.0001)))
     
+    x=jacobi(A,B,1000,0.0001)
+    print("\nJacobi of Ax=B  iterations,error=\n",x[1],x[2])
+    x=gauss_siedel(A,B,1000,0.0001)
+    print("\nGauss Siedel of Ax=B  iterations,error=\n",x[1],x[2])
+    x=(SOR(A,B,1.2,100,0.0001))
+    print("\nSOR of Ax=B  iterations,error=\n",x[1],x[2])
+    
+    
+    A=[[5,7],[4,3]]
     print("\nA=\n",numpy.array(A))
     print("\nGivens of A:\n")
     Q,R=givens(A)
@@ -256,7 +263,7 @@ def main():
     b=transpose([[2,12,5,4,7]])
     print("\nb=:\n",numpy.array(b))
     x=product(pseudo_inverse(A),b)
-    print("\nsolution of Ax=b using pseudo_inverse: x=:\n",numpy.array(x))
+    print("\nLeast square solution of Ax~b using pseudo_inverse: x=:\n",numpy.array(x))
     print("\nAx:\n",numpy.array(product(A,x)))
     
     A=[[2,4,8,16],[3,8,27,81],[1,5,25,125],[4,16,64,256],[1,6,36,215],[1,7,49,343]]
