@@ -2,6 +2,8 @@ import copy
 import math
 import numpy
 import time
+import matplotlib.pyplot as plt 
+import random
 def innerproduct(a,b):
 	if len(a)!=len(b):
 		raise ValueError
@@ -231,6 +233,54 @@ def condition_number(A):
     A1=pseudo_inverse(A)
     return math.sqrt(ro(product(A,transpose(A)))*ro(product(A1,transpose(A1))))
 
+def plot():
+    n=[]
+    t_gaussianelimination=[]
+    t_gaussianelimination_spp=[]
+    t_jacobi=[]
+    t_gauss_siedel=[]
+    t_SOR=[]
+    for i in range(2,6):
+        n+=[i]
+        A=[[0 for j in range(i)] for k in range(i)]
+        B=[random.random() for j in range(i)]
+        for j in range(i):
+            for k in range(i):
+                A[j][k]=(1+3*(j==k))*random.random()
+        t=time.time()
+        for m in range(1000):
+            gaussianelimination(A,B,False)
+        t_gaussianelimination+=[time.time()-t]
+        
+        t=time.time()
+        for m in range(1000):
+            gaussianelimination(A,B,True)
+        t_gaussianelimination_spp+=[time.time()-t]
+        
+        t=time.time()
+        for m in range(1000):
+            jacobi(A,B,100,0.1)
+        t_jacobi+=[time.time()-t]
+        
+        t=time.time()
+        for m in range(100):
+            gauss_siedel(A,B,1000,0.1)
+        t_gauss_siedel+=[time.time()-t] 
+        
+        t=time.time()
+        for m in range(100):
+            SOR(A,B,1.2,100,0.1)
+        t_SOR+=[time.time()-t]
+    
+    plt.plot(n,t_gaussianelimination,label="gaussianelimination")
+    plt.plot(n,t_gaussianelimination_spp,label="gaussianelimination_spp") 
+    plt.plot(n,t_jacobi,label="jacobi")
+    plt.plot(n,t_gauss_siedel,label="gauss_siedel")
+    plt.plot(n,t_SOR,label="SOR")
+    plt.legend() 
+    plt.show()
+        
+
 def main():
     A=[[12,3,9,4],[0,19,5,8],[7,6,20,5],[1,6,3,12]]
     print("\nA=\n",numpy.array(A))
@@ -246,7 +296,7 @@ def main():
     print("\nJacobi of Ax=B  iterations,error=\n",x[1],x[2])
     x=gauss_siedel(A,B,1000,0.0001)
     print("\nGauss Siedel of Ax=B  iterations,error=\n",x[1],x[2])
-    x=(SOR(A,B,1.2,100,0.0001))
+    x=SOR(A,B,1.2,100,0.0001)
     print("\nSOR of Ax=B  iterations,error=\n",x[1],x[2])
     
     
@@ -270,6 +320,7 @@ def main():
     print("\nLet A be a 6x4 Vandermonde matrix. A:\n",numpy.array(A))
     print("\nIts condition_number is: ",condition_number(A))
     print("As per matlab, 1.1733e+03\n")
+    
 
 if __name__ == "__main__":
     main()
