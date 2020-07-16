@@ -1,0 +1,53 @@
+\documentclass{beamer}
+
+\title{Finite Element Method}
+\subtitle{Presentation}
+
+%\usetheme{lucid}
+\begin{document}
+	\frame{
+		\titlepage
+	}
+	\frame{
+		\frametitle{Poisson's Equation}
+		$-\Delta u = f $ in $ \Omega$
+		\linebreak\linebreak
+		Dirichlet Condition: $u=0$ on $\Gamma \subset \partial \Omega$
+		\linebreak\linebreak
+		Neumann Condition: $\frac{\partial u}{\partial \nu}=0$ on $\partial \Omega \setminus \Gamma$
+		\linebreak\linebreak
+		Where $\frac{\partial u}{\partial \nu}=\nu \cdot \triangledown u $ and $\nu$ is the outward unit normal vector to $\partial \Omega$.
+	}
+	\frame{
+		\frametitle{Variational Formulation}
+		$V:=\{ v \in H^{1}(\Omega):v|_{\Gamma}=0\}$
+		\linebreak\linebreak
+		$a(u,v):=\int\limits_{\Omega}\triangledown u \cdot \triangledown v$ $ dx$
+		\linebreak\linebreak
+		$(f,v):=\int\limits_{\Omega} f v$ $ dx$
+		\linebreak\linebreak
+		Find $u \in V$ satisfiying $a(u,v)=(f,v)$  $ \forall v \in V$.
+	}
+	\frame{
+		\frametitle{Galerkin Approximation Problem}
+		Let $V_h \subset V$ be a finite dimensional subspace.
+		\linebreak
+		Find $u_h \in V_h$ such that $a(u_h,v)=(f,v)$ $\forall v \in V_h$.
+		\linebreak\linebreak
+		Then, by Céa's Theorem, $$ ||u-u_h||\leq \frac{C}{\alpha} \min_{v \in V_h} ||u-v||_V$$
+	}
+	\frame{
+		\frametitle{Galerkin Approximation Problem}
+		Solve $[a(e_j,e_i)]_{n \times n}[u_i]_{n \times 1}=[(f,e_i)]_{n \times 1}$.
+		\linebreak
+		Where $n$ is the dimension of $V_h$ and $\{e_i\}$ is a basis of $V_h$.
+		\linebreak\linebreak
+		Then $\sum\limits_{i=1}^n u_i e_i$ is the solution of the Galerkin approximation problem.
+	}
+	\frame{
+		\frametitle{Triangular Piecewise-polynomial Elements for 2-D Domain}
+		The domain $\Omega$ is approximated by a triangular mesh.
+		\linebreak\linebreak
+		On each triangle, the space of $k$ degree polynomials in two variables is $(k+1)(k+2)/2$ dimensional.
+	}
+\end{document}

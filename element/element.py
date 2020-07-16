@@ -229,7 +229,6 @@ for i in range(0,L1):
 def test_boundary(i):
     return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
-    return 0
     if i<L2:return 1
     else:return 0
     #if i==L2/2 or i==L2/2-1 :return 1
