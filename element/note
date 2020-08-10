@@ -1,0 +1,25 @@
+
+-Existence of solution of poisson's equation.
+	By the existence of solution of 2 and equivalence of 1 and 2.
+
+-If u solves 2 then u solves 1? In weak sense?
+	Proposition 5.1.9 Page 131 Brenner & Scott.
+	For u=g on boundary find g_ s.t. g_=g on boundary and find solution of u-g
+	For du/dv = h on boundary, extra term.
+
+-If u is doubly differentiable then?
+	Clearly if u solves 1 then it solves 2.
+	Converse: Proposition 5.1.9 Page 131 Brenner & Scott., and that the weak derivate is equal to strong derivative for differentiable functions.
+	
+-Do without Lax-Miligram lemma. (Au=F)
+	A should be onto. Injectivity implies uniqueness.
+
+//TODO:
+-When does Lagrange element not work?
+	Brenner & Scott chapter 10.
+
+//TODO:
+-Order of convergence.
+
+//TODO:
+-In P1 nonconforming, why is continuity required at midpoints?

@@ -38,7 +38,7 @@
 	}
 	\frame{
 		\frametitle{Galerkin Approximation Problem}
-		Solve $[a(e_j,e_i)]_{n \times n}[u_i]_{n \times 1}=[(f,e_i)]_{n \times 1}$.
+		Solve $[ a(e_j,e_i) ]_{n \times n} [ u_i ]_{n \times 1}=[(f,e_i)]_{n \times 1}$.
 		\linebreak
 		Where $n$ is the dimension of $V_h$ and $\{e_i\}$ is a basis of $V_h$.
 		\linebreak\linebreak
@@ -49,5 +49,33 @@
 		The domain $\Omega$ is approximated by a triangular mesh.
 		\linebreak\linebreak
 		On each triangle, the space of $k$ degree polynomials in two variables is $(k+1)(k+2)/2$ dimensional.
+		\linebreak\linebreak
+		In a Lagrange triangle, there are $3$ evaluation points on the vertices, $3(k-1)$ on the edge interiors and the remaining in the interior of the triangle.
+	}
+	\frame{
+		\frametitle{$P_1$ Nonconforming Element}
+		In the $P_1$ nonconforming element, the functions are linear on each triangle and the three evaluation points are at the midpoints of the edges.
+		\linebreak\linebreak
+		Thus, the functions are in general discontinuous at the edges except at the midpoints.
+	}
+	\frame{
+		\frametitle{$P_1$ Nonconforming Element}
+		Let $V=H_{o}^{1}(\Omega)$.
+		\linebreak\linebreak
+		Then in the $P_1$ nonconforming element, $V_h$ is not a subspace of $V$.
+		\linebreak\linebreak
+		Define $a_h(v,w)=\sum\limits_{T \in \mathcal{T}_h} \int_T \triangledown v \cdot \triangledown w $$dx$
+		\linebreak\linebreak
+		And $||v||_h=\sqrt{a_h(v,v)} $
+		\linebreak\linebreak
+		Then, $a_h(.,.) \equiv a(.,.)$ on $V$.
+		\linebreak\linebreak
+		Also $a_h$ is positive-definite on $V_h$.
+	}
+	
+	\frame{
+		\frametitle{$P_1$ Nonconforming Element}
+		\textbf{Theorem} If $\Omega$ is a convex polygonal domain , $f \in L^2(\Omega)$ then
+		$$ ||u-u_h||_h<Ch^2|u|_{H^2(\Omega)} $$.
 	}
 \end{document}
