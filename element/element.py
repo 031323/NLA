@@ -103,11 +103,27 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
 					if mesh.node_type[node]==' ':
 						Mi.append(pow(x,j-k)*pow(y,k))
 					elif mesh.node_type[node]=='x':
-						Mi.append((j-k)*pow(x,j-k-1)*pow(y,k))
+						Mi.append((j-k)*pow(x,max(j-k-1,0))*pow(y,k))
 					elif mesh.node_type[node]=='y':
-						Mi.append((k)*pow(x,j-k)*pow(y,k-1))
+						Mi.append((k)*pow(x,j-k)*pow(y,max(k-1,0)))
+					'''
+					elif mesh.node_type[node]=='l' or mesh.node_type[node]=='r':
+						d=0
+						if mesh.node_type[node]=='l':d=1
+						else:d=-1
+						for i in range(0,3):
+							if [x,y]==v[i]:v_node=i;break;
+						node2=v[(i+d)%3]
+						l=math.sqrt(pow(node2[0]-x,2)+pow(node2[1]-y,2))
+						Dx=(node2[0]-x)/l
+						Dy=(node2[1]-y)/l
+						Mi.append((j-k)*pow(x,max(j-k-1,0))*pow(y,k)*Dx+Dy*(k)*pow(x,j-k)*pow(y,max(k-1,0)))
+					'''
 			M.append(Mi)
 		ce=numpy.linalg.inv(M)
+		
+		#  a(ei,ej) in omega
+		
 		for i in range(0,len(triangle)):
 			for j in range(i,len(triangle)):
 				if fixed(triangle[i]) or fixed(triangle[j]):
@@ -129,6 +145,9 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
 					A[node_map[triangle[j]],node_map[triangle[i]]]+=integration
 		
 		for i in range(0,len(triangle)):
+		
+		# f(ei) in omega
+		
 			if fixed(triangle[i]):continue
 			integration=0
 			p=2*degree
@@ -143,6 +162,8 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
 			
 			#if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
 			
+			# a(g,ei) in omega
+			
 			p=2*degree-2
 			quadratures=gq2d[p-1]
 			for j in range(0,len(triangle)):
@@ -153,10 +174,12 @@ def solve(mesh,degree,boundary,f,fixed,g=lambda x:0,h=lambda x:0):
 					for l in range(0,3):
 						x+=v[l][0]*quadratures[k][0][l]
 						y+=v[l][1]*quadratures[k][0][l]
-					integration-=g(triangle[j])*area*quadratures[k][1]*\
+					integration-={' ':g(triangle[j]), 'x':0, 'y':0}[mesh.node_type[triangle[j]]]*area*quadratures[k][1]*\
 					(dx_pxy(degree,ce[:,i],x,y)*dx_pxy(degree,ce[:,j],x,y)+dy_pxy(degree,ce[:,i],x,y)*dy_pxy(degree,ce[:,j],x,y))
 			
 			#if triangle[i]==2 or triangle[i]==22:print([triangle,triangle[i],integration])
+			
+			# h*ei on (boundary of omega - Gamma). Note that g0 is zero on this part.
 			
 			if(boundary(triangle[i])):
 				for a in range(0,3):
@@ -195,47 +218,99 @@ class mesh:
 	triangle_vertices=[]
 
 test_mesh=mesh()
+element_type='hermite'
+# hermite triangle pair
+# 0 1 1 0
+# 1 0 1 1
+# 1 1 0 1
+# 0 1 1 0
 degree=3
+if element_type=='hermite':degree=3
 l1=1
 l2=1
-L1=2*degree*2+1
-L2=2*degree*2+1
+n_block_per_side=4
+if element_type=='lagrange':
+	L1=n_block_per_side*degree*2+1
+	L2=n_block_per_side*degree*2+1
+	spe=degree # sections per edge
+else:
+	L1=n_block_per_side*1*2+1
+	L2=n_block_per_side*1*2+1
+	spe=1
 n_elements2=0
+hermite_map=[]
+hermite_extra_nodes=[]
+hermite_extra_node_type=[]
 for i in range(0,L1):
 	for j in range(0,L2):
 		test_mesh.nodes.append([i/(L1-1)*l1,j/(L2-1)*l2])
 		test_mesh.node_type.append(' ')
-		if (i!=0) and (j!=0) and (i%degree==0) and (j%degree==0):
+		if element_type=='hermite':
+			hermite_map+=[len(hermite_extra_nodes)]
+			hermite_extra_nodes.append([i/(L1-1)*l1,j/(L2-1)*l2])
+			hermite_extra_node_type.append('x')
+			hermite_extra_nodes.append([i/(L1-1)*l1,j/(L2-1)*l2])
+			hermite_extra_node_type.append('y')
+		if (i!=0) and (j!=0) and (i%spe==0) and (j%spe==0):
 			n_elements2+=1
-			F2=((n_elements2+int((n_elements2-1)*degree/(L2-1)))%2==0)
+			F2=((n_elements2+int((n_elements2-1)*spe/(L2-1)))%2==0)
 			#print([n_elements2,(n_elements2-1)*degree,L2-1,int((n_elements2-1)*degree/(L2-1)),(n_elements2+int((n_elements2-1)*degree/(L2-1))),F2])
 			t1=[]
 			t2=[]
-			for i_ in range(i-degree,i+1):
-				for j_ in range(j-degree,j+1):
+			for i_ in range(i-spe,i+1):
+				for j_ in range(j-spe,j+1):
 					node=L2*i_+j_
 					if F2:
-						if (i-i_+j-j_>=degree):
+						if (i-i_+j-j_>=spe):
 							t1+=[node]
-						if (i-i_+j-j_<=degree):
+							if element_type=='hermite':
+								t1+=[L1*L2+hermite_map[node],L1*L2+hermite_map[node]+1]
+						if (i-i_+j-j_<=spe):
 							t2+=[node]
+							if element_type=='hermite':
+								t2+=[L1*L2+hermite_map[node],L1*L2+hermite_map[node]+1]
 					else:
 						if (i-i_<=j-j_):
 							t1+=[node]
+							if element_type=='hermite':
+								t1+=[L1*L2+hermite_map[node],L1*L2+hermite_map[node]+1]
 						if (i-i_>=j-j_):
 							t2+=[node]
-			mesh.triangles+=[t1,t2]
-			v00=L2*(i-degree)+j-degree
-			v01=L2*(i-degree)+j
+							if element_type=='hermite':
+								t2+=[L1*L2+hermite_map[node],L1*L2+hermite_map[node]+1]
+							
+			v00=L2*(i-spe)+j-spe
+			v01=L2*(i-spe)+j
 			v11=L2*i+j
-			v10=L2*i+j-degree
+			v10=L2*i+j-spe
+			
 			if F2:
-				mesh.triangle_vertices+=[[v00,v01,v10],[v10,v11,v01]]
+				test_mesh.triangle_vertices+=[[v00,v01,v10],[v10,v11,v01]]
+				c1=[(test_mesh.nodes[v00][0]+test_mesh.nodes[v01][0]+test_mesh.nodes[v10][0])/3,(test_mesh.nodes[v00][1]+test_mesh.nodes[v01][1]+test_mesh.nodes[v10][1])/3]
+				c2=[(test_mesh.nodes[v10][0]+test_mesh.nodes[v11][0]+test_mesh.nodes[v01][0])/3,(test_mesh.nodes[v10][1]+test_mesh.nodes[v11][1]+test_mesh.nodes[v01][1])/3]
 			else:
-				mesh.triangle_vertices+=[[v00,v11,v10],[v00,v01,v11]]
+				test_mesh.triangle_vertices+=[[v00,v11,v10],[v00,v01,v11]]
+				c1=[(test_mesh.nodes[v00][0]+test_mesh.nodes[v11][0]+test_mesh.nodes[v10][0])/3,(test_mesh.nodes[v00][1]+test_mesh.nodes[v11][1]+test_mesh.nodes[v10][1])/3]
+				c2=[(test_mesh.nodes[v00][0]+test_mesh.nodes[v01][0]+test_mesh.nodes[v11][0])/3,(test_mesh.nodes[v00][1]+test_mesh.nodes[v01][1]+test_mesh.nodes[v11][1])/3]
+				
+			if element_type=='hermite':
+				hermite_extra_nodes.append(c1)
+				hermite_extra_node_type.append(' ')
+				t1+=[L1*L2+len(hermite_extra_nodes)-1]
+				
+				hermite_extra_nodes.append(c2)
+				hermite_extra_node_type.append(' ')
+				t2+=[L1*L2+len(hermite_extra_nodes)-1]
+			
+			test_mesh.triangles+=[t1,t2]
+
+test_mesh.nodes+=hermite_extra_nodes
+test_mesh.node_type+=hermite_extra_node_type
 def test_boundary(i):
-	return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
+	return test_mesh.nodes[i][0]==0 or test_mesh.nodes[i][0]==1 or test_mesh.nodes[i][1]==0 or test_mesh.nodes[i][1]==1
+	#return i<L2 or i>=L2*(L1-1) or i%L2==0 or (i+1)%L2==0
 def test_fixed(i):
+	return test_mesh.nodes[i][0]==0
 	if i<L2:return 1
 	else:return 0
 	#if i==L2/2 or i==L2/2-1 :return 1
