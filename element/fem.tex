@@ -1,12 +1,142 @@
 \documentclass{beamer}
+\usepackage[english]{babel}
+\usepackage{biblatex}
+\usepackage{tikz}
+\usepackage{color}
 
-\title{Finite Element Method}
+\def\R{\mathbb{R}}
+\newcommand{\p}{ }
+
+\newtheorem{gs}{General Solution}
+
+\newcommand{\cb}{\color{blue}}
+\newcommand{\cred}{\color{red}}
+\newcommand{\cg}{\color{green}}
+\newcommand{\cbr}{\color{Brown}}
+\newcommand{\cm}{\color{Magenta}}
+%\newcommand{\cb}{\color{blue}}
+\newcommand{\dsp}{\displaystyle}
+
+\newcommand{\fby}{\fcolorbox{blue}{yellow}}
+\newcommand{\fbw}{\fcolorbox{blue}{white}}
+\def \stackt{{\stackrel{.}{.\;.}\;\;}}
+\def \stackb{{\stackrel{.\;.}{.}\;\;}}
+
+\def\diam{\mathrm{diam}\,}
+\def\p{\partial}
+\def\O{\Omega}
+\def\R{\mathbb{R}}
+\def\cE{\mathcal{E}}
+\def\cT{\mathcal{T}}
+\def\cB{\mathcal{B}}
+\def\cA{\mathcal{A}}
+\def\cN{\mathcal{N}}
+\def\Sides{\mathcal{E}_h}
+\def\Jump#1{\Big[\!\!\Big[#1\Big]\!\!\Big]}
+\def\mJump#1{\big[\hskip -3pt\big[#1\big]\hskip -3pt\big]}
+\def\jump#1{[\![#1]\!]}
+\def\Mean#1{\Big\{\!\!\!\Big\{#1\Big\}\!\!\!\Big\}}
+\def\mMean#1{\big\{\hskip -4pt\big\{#1\big\}\hskip -4pt\big\}}
+\def\mean#1{\{\!\!\{#1\}\!\!\}}
+\def\cT{\mathcal{T}}
+\def\cE{\mathcal{E}}
+\def\ssT{{\scriptscriptstyle T}}
+\def\sjump#1{[\hskip -1.5pt[#1]\hskip -1.5pt]}
+\def\d{\displaystyle}
+\newcommand\Blesssim{\;\raise 2pt\hbox{$<$}\hskip -16pt
+  \lower 9pt\hbox{$\sim$}\;}
+  \newcommand{\pa}{\partial}
+  \newcommand{\del}{\bigtriangleup}
+%\newcommand\lesssim{\;\raise 2pt\hbox{$<$}\hskip -14pt
+%  \lower 8pt\hbox{$\sim$}\;}
+\newcommand\alesssim{\raise 2pt\hbox{$<$}\hskip -14pt
+  \lower 8pt\hbox{$\sim$}\;}
+\def\deq{\,\raise 4pt\hbox{\tiny def}\hskip -10pt\lower
+ 4pt\hbox{$=$}\;}
+\def\tbar{|\!|\!|}
+\def\therefore{\hbox{\bf .}\hskip 2pt\hbox{\bf .}
+ \hskip -12.5pt\raise 6pt\hbox{\bf .}\hskip 16pt}
+\def\so{{\scriptscriptstyle 1}}
+\def\st{{\scriptscriptstyle 2}}
+\def\sth{{\scriptscriptstyle 3}}
+\def\sz{{\scriptscriptstyle 0}}
+\def\tR{{R'}}
+\def\sf{{\scriptscriptstyle 4}}
+\def\bE{\mathbb{E}}
+\def\bA{\mathbb{A}}
+%
+\def\bu{\boldsymbol{u}}
+\def\ba{\boldsymbol{a}}
+\def\bsi{\boldsymbol{\sigma}}
+\def\btau{\boldsymbol{\tau}}
+\def\buz{\mathaccent'27{\bu}}
+\def\bzz{\mathaccent'27{\bz}}
+\def\bq{\boldsymbol{q}}
+\def\bw{\boldsymbol{w}}
+\def\bW{\boldsymbol{W}}
+\def\bz{\boldsymbol{z}}
+\def\bn{\boldsymbol{n}}
+\def\bof{\boldsymbol{f}}
+\def\curl{\nabla\times}
+\def\div{\nabla\cdot}
+\def\curlh{\nabla_h\times}
+\def\ncross{{\bn\times}}
+\def\HCurlz{H_0(\mathrm{curl};\O)}
+\def\HDivz{H(\mathrm{div}^0;\O)}
+\def\HDiv{H(\mathrm{div};\O)}
+\def\HCD{\HCurlz\cap\HDivz}
+
+
+\addbibresource{fem.bib}
+\title{Finite Element Method for Elliptic Equations}
 \subtitle{Presentation}
-
+\author{Utkarsh Rajput\linebreak SC19D035}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{footline}{\hfill\usebeamertemplate***{navigation symbols}}
 %\usetheme{lucid}
 \begin{document}
 	\frame{
 		\titlepage
+	}
+	\frame{
+\frametitle{Introduction}
+The Finite Element Method (FEM) is a numerical techinique
+\begin{itemize}
+	\item for solving problems which are described by Ordinary Differential Equations (ODE) or Partial Differential Equations (PDE) with appropriate boundary initial conditions
+	\item or to solve problems that can be formulated as a functional minimization
+\end{itemize}
+
+Fisrt suggested by Courant\footfullcite{courant} in 1943.
+}
+\frame{
+\frametitle{Why FEM?}
+\begin{itemize}
+\item
+ Greater flexibility to model complex geometries.\\ 
+\item
+ Can handle general boundary conditions.\\ 
+\item
+ Clear structure and versatility helps to construct general
+purpose software for applications.\\ 
+\item
+ Has a solid theoretical foundation which gives added
+reliability and makes it possible to mathematically analyze and estimate
+the error in the approximate solution.\\
+\end{itemize}
+}
+\frame{
+		\frametitle{The method}
+		
+		The main steps involved are:
+		
+		1. Variational Formulation
+		
+		2. Discretization of the problem
+		
+		3. Converting to a system of linear equations
+		
+		4. Solving the system of linear equations
+		
 	}
 	\frame{
 		\frametitle{Poisson's Equation}
@@ -34,7 +164,7 @@
 		\linebreak
 		Find $u_h \in V_h$ such that $a(u_h,v)=(f,v)$ $\forall v \in V_h$.
 		\linebreak\linebreak
-		Then, by Céa's Theorem, $$ ||u-u_h||\leq \frac{C}{\alpha} \min_{v \in V_h} ||u-v||_V$$
+		This is well posed because $a(.,.)$ is continuous elliptic bilinear form on $V_h$ and $(f,.)$ is continuous linear form. Thus Lax-Miligram theorem applies.
 	}
 	\frame{
 		\frametitle{Galerkin Approximation Problem}
@@ -45,6 +175,31 @@
 		Then $\sum\limits_{i=1}^n u_i e_i$ is the solution of the Galerkin approximation problem.
 	}
 	\frame{
+	{\cb Triangulation of $\bar{\Omega}$:
+}
+ 
+
+By an admissible triangulation $ \tau_h $ of a closed domain $\bar{\Omega} \subset \R^2$, we mean a subdivision of $\bar{\Omega}$ into closed triangles or rectangles or quadrilaterals denoted by $ \{ T_i \} $  such that
+ 
+\begin{eqnarray}
+& & {  (i) \; \bar{\Omega} = \displaystyle{\cup} T_i } \nonumber \\  
+& &{  (ii) \; T_i \cap T_j =} \left \{ \begin{array}{l}
+{  \phi} \\  
+\mbox{  common vertex } \; \qquad \mbox{   for } {  i \neq j} \\  
+\mbox{  common side}
+\end{array} \right. \\  
+& & {  (iii) \; T_i^{\circ} \cap T_j^{\circ} = \phi \; } \mbox{   for } {  i \neq j} \nonumber
+\end{eqnarray}
+
+	}
+
+	\frame{
+		\frametitle{Triangular Piecewise-polynomial Elements for 2-D Domain}
+	For simplicity, we shall assume that $ \partial \Omega = \Gamma $ is a
+polygonal curve, i.e., $\Omega$ is a polygonal domain. If $\Gamma$ is
+curved, we may first approximate $\Gamma$ with a polygonal curve.
+	}
+	\frame{
 		\frametitle{Triangular Piecewise-polynomial Elements for 2-D Domain}
 		The domain $\Omega$ is approximated by a triangular mesh.
 		\linebreak\linebreak
@@ -52,30 +207,46 @@
 		\linebreak\linebreak
 		In a Lagrange triangle, there are $3$ evaluation points on the vertices, $3(k-1)$ on the edge interiors and the remaining in the interior of the triangle.
 	}
-	\frame{
-		\frametitle{$P_1$ Nonconforming Element}
-		In the $P_1$ nonconforming element, the functions are linear on each triangle and the three evaluation points are at the midpoints of the edges.
-		\linebreak\linebreak
-		Thus, the functions are in general discontinuous at the edges except at the midpoints.
-	}
-	\frame{
-		\frametitle{$P_1$ Nonconforming Element}
-		Let $V=H_{o}^{1}(\Omega)$.
-		\linebreak\linebreak
-		Then in the $P_1$ nonconforming element, $V_h$ is not a subspace of $V$.
-		\linebreak\linebreak
-		Define $a_h(v,w)=\sum\limits_{T \in \mathcal{T}_h} \int_T \triangledown v \cdot \triangledown w $$dx$
-		\linebreak\linebreak
-		And $||v||_h=\sqrt{a_h(v,v)} $
-		\linebreak\linebreak
-		Then, $a_h(.,.) \equiv a(.,.)$ on $V$.
-		\linebreak\linebreak
-		Also $a_h$ is positive-definite on $V_h$.
-	}
 	
 	\frame{
-		\frametitle{$P_1$ Nonconforming Element}
-		\textbf{Theorem} If $\Omega$ is a convex polygonal domain , $f \in L^2(\Omega)$ then
-		$$ ||u-u_h||_h<Ch^2|u|_{H^2(\Omega)} $$.
+	\frametitle{An example}
+		We take $V_h$ to be the space of continuous piecewise linear functions on $\bar{\Omega}$ which are linear on each triangle of the triangulation.
+		\linebreak\linebreak
+		Now we need to fix a basis for $V_h$. Here we use the nodal basis.
 	}
+	\frame{
+	\frametitle{Nodal Basis}
+  For $f \in V_h$, and $T\in \{T_i\}$, $f|_T$ would be of the form $$f|_T (x,y)=a_1 x+a_2 y+a_3$$
+	Consider the triangle as follows.
+	
+	\begin{tikzpicture}
+		\draw node[anchor=north east]{$(x_1,y_1)$} (0,0) --  (3,0) node[anchor=north west]{$(x_2,y_2)$} -- (0,3) node[anchor=south east]{$(x_3,y_3)$} -- (0,0);
+		\draw[black,fill=black] (0,0) circle (.3ex);
+		\draw[black,fill=black] (3,0) circle (.3ex);
+		\draw[black,fill=black] (0,3) circle (.3ex);
+	\end{tikzpicture}
+	}
+	\frame{
+	\frametitle{Nodal Basis}
+	
+	Let $\{N_1,N_2,N_3\}$ be a subset of the space of linear funcionals on $P=V_h|_T$ defined as follows.
+	\linebreak\linebreak
+	$N_1(f)=f(x_1,y_1); \;\;\; N_2(f)=f(x_2,y_2); \;\;\; N_3(f)=f(x_3,y_3);$
+	\linebreak\linebreak
+	The nodal basis for $P$ is $\{\phi_1,\phi_2,\phi_3\}$ such that $N_i(\phi_j)=\delta_{ij} \;\;\; \forall i,j \in \{1,2,3\}$.
+	}
+	\frame{
+	\frametitle{Nodal Basis}
+	The nodal basis for $V_h$ is constructed as follows.
+	\linebreak\linebreak
+	For each node, the basis function is defined on each triangle $T$ as
+	\begin{itemize}
+	\item $0$ if the node does not lie in the closure of the $T$
+	\item the nodal basis function of that node in $V_h|_T$ otherwise
+	\end{itemize}
+	
+	Now, we can solve $[ a(e_j,e_i) ]_{n \times n} [ u_i ]_{n \times 1}=[(f,e_i)]_{n \times 1}$ to get the solution $\sum\limits_{i=1}^n u_i e_i$.
+\nocite{*}
+	}
+\printbibliography
 \end{document}
