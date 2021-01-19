@@ -1,0 +1,14 @@
+coursework
+FEM numerical and error results (rate of convergence, how?)
+VEM a_h stability
+50 slides
+
+mixed suitable stabilizer
+mixed VEM stokes problem fluid flow
+
+Presentation
+-	1. Y1, Y2 usage
+-	2. Regular, quasi-uniform triangulation
+-	3. Inf-Sup for discrete
+-	4. Raviert Thomas (k=1) as mixed FEM
+-	5. Calculating approximate Fv

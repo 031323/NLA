@@ -1,0 +1,240 @@
+\documentclass{beamer}
+\usepackage[english]{babel}
+\usepackage{biblatex}
+\usepackage{tikz}
+\usepackage{color}
+
+\def\R{\mathbb{R}}
+\newcommand{\p}{ }
+
+\newtheorem{gs}{General Solution}
+
+\newcommand{\cb}{\color{blue}}
+\newcommand{\cred}{\color{red}}
+\newcommand{\cg}{\color{green}}
+\newcommand{\cbr}{\color{brown}}
+\newcommand{\cm}{\color{Magenta}}
+%\newcommand{\cb}{\color{blue}}
+\newcommand{\dsp}{\displaystyle}
+
+\newcommand{\fby}{\fcolorbox{blue}{yellow}}
+\newcommand{\fbw}{\fcolorbox{blue}{white}}
+\def \stackt{{\stackrel{.}{.\;.}\;\;}}
+\def \stackb{{\stackrel{.\;.}{.}\;\;}}
+
+\def\diam{\mathrm{diam}\,}
+\def\p{\partial}
+\def\O{\Omega}
+\def\R{\mathbb{R}}
+\def\cE{\mathcal{E}}
+\def\cT{\mathcal{T}}
+\def\cB{\mathcal{B}}
+\def\cA{\mathcal{A}}
+\def\cN{\mathcal{N}}
+\def\Sides{\mathcal{E}_h}
+\def\Jump#1{\Big[\!\!\Big[#1\Big]\!\!\Big]}
+\def\mJump#1{\big[\hskip -3pt\big[#1\big]\hskip -3pt\big]}
+\def\jump#1{[\![#1]\!]}
+\def\Mean#1{\Big\{\!\!\!\Big\{#1\Big\}\!\!\!\Big\}}
+\def\mMean#1{\big\{\hskip -4pt\big\{#1\big\}\hskip -4pt\big\}}
+\def\mean#1{\{\!\!\{#1\}\!\!\}}
+\def\cT{\mathcal{T}}
+\def\cE{\mathcal{E}}
+\def\ssT{{\scriptscriptstyle T}}
+\def\sjump#1{[\hskip -1.5pt[#1]\hskip -1.5pt]}
+\def\d{\displaystyle}
+\newcommand\Blesssim{\;\raise 2pt\hbox{$<$}\hskip -16pt
+  \lower 9pt\hbox{$\sim$}\;}
+  \newcommand{\pa}{\partial}
+  \newcommand{\del}{\bigtriangleup}
+%\newcommand\lesssim{\;\raise 2pt\hbox{$<$}\hskip -14pt
+%  \lower 8pt\hbox{$\sim$}\;}
+\newcommand\alesssim{\raise 2pt\hbox{$<$}\hskip -14pt
+  \lower 8pt\hbox{$\sim$}\;}
+\def\deq{\,\raise 4pt\hbox{\tiny def}\hskip -10pt\lower
+ 4pt\hbox{$=$}\;}
+\def\tbar{|\!|\!|}
+\def\therefore{\hbox{\bf .}\hskip 2pt\hbox{\bf .}
+ \hskip -12.5pt\raise 6pt\hbox{\bf .}\hskip 16pt}
+\def\so{{\scriptscriptstyle 1}}
+\def\st{{\scriptscriptstyle 2}}
+\def\sth{{\scriptscriptstyle 3}}
+\def\sz{{\scriptscriptstyle 0}}
+\def\tR{{R'}}
+\def\sf{{\scriptscriptstyle 4}}
+\def\bE{\mathbb{E}}
+\def\bA{\mathbb{A}}
+%
+\def\bu{\boldsymbol{u}}
+\def\ba{\boldsymbol{a}}
+\def\bsi{\boldsymbol{\sigma}}
+\def\btau{\boldsymbol{\tau}}
+\def\buz{\mathaccent'27{\bu}}
+\def\bzz{\mathaccent'27{\bz}}
+\def\bq{\boldsymbol{q}}
+\def\bw{\boldsymbol{w}}
+\def\bW{\boldsymbol{W}}
+\def\bz{\boldsymbol{z}}
+\def\bn{\boldsymbol{n}}
+\def\bof{\boldsymbol{f}}
+\def\curl{\nabla\times}
+\def\div{\nabla\cdot}
+\def\curlh{\nabla_h\times}
+\def\ncross{{\bn\times}}
+\def\HCurlz{H_0(\mathrm{curl};\O)}
+\def\HDivz{H(\mathrm{div}^0;\O)}
+\def\HDiv{H(\mathrm{div};\O)}
+\def\HCD{\HCurlz\cap\HDivz}
+
+
+\addbibresource{fem.bib}
+\title{Error Estimates and Implementation}
+\subtitle{Presentation}
+\author{Utkarsh Rajput\linebreak SC19D035}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{footline}{\hfill\usebeamertemplate***{navigation symbols}}
+%\usetheme{lucid}
+\begin{document}
+\frame{
+		\titlepage
+	}
+\frame{
+\frametitle{A priori Error Estimates}
+ To obtain the estimates $\|u-u_h\|_V$,
+
+The important steps involved are:    \\
+\begin{enumerate}
+\item[1.] Cea's lemma  \\
+\item[2.] Interpolation operator  \\
+\item[3.] Duality Arguments   \\
+\item[4.] Estimate $\parallel u-u_{h}\parallel_{V}$
+\item[5.] Estimate $\parallel u-u_{h}\parallel_{L^2}$
+
+%, \parallel
+%u-u_{h}\parallel_{0,\Omega}$ (using Aubin-Nitsche duality arguments).
+\end{enumerate}
+}
+\frame{
+\frametitle{Cea's Lemma}
+\noindent
+ Let $u$ and $u_h$ be the solutions of continuous and discrete problems respectively.
+Then, $$ ||u-u_h||\leq \frac{C}{\alpha} \min_{v \in V_h} ||u-v||_V$$
+}
+\frame{
+\frametitle{Proof}
+We have 
+$\; \forall v_h \in V_h$,  
+$$
+\left. \begin{array}{lll}
+a(u,v_h) & = & f(v_h)   \\
+a(u_h,v_h) & = & f(v_h)  
+\end{array} \right \} \Rightarrow  a(u-u_h,v_h) = 0 \qquad \forall v_h
+\in V_h.  
+$$
+This is called the Galerkin orthogonality property, i.e.,
+the finite element solution $u_h$ is the  orthogonal projection of the  exact
+solution $u$ onto $V_h$ with respect to the inner product
+$a(\cdot,\cdot)$.
+}
+\frame{
+\frametitle{Proof}
+
+\begin{eqnarray*}
+\alpha \|u-u_h\|_V^2 & \leq & a(u-u_h,u-u_h) \; (\mbox{\cbr By
+coercivity of } a(\cdot,\cdot) )   \\
+& = & a(u-u_h,u-v_h) + \displaystyle\underbrace{a(u-u_h, v_h-u_h)}_{= 0}
+  \\
+\mbox{i.e., } \|u-u_h\|_V^2 & \leq & \frac{C}{\alpha} \|u-u_h\|_V
+\|u-v_h\|_V \; \mbox{\cbr (Boundedness of } {\cbr a(\cdot,\cdot) )}.
+\end{eqnarray*}
+In case $u=u_h$, the result is trivial.  
+
+\noindent
+For $u \neq u_h, \; \|u-u_h\|_V \leq \displaystyle
+\frac{C}{\alpha} \|u-v_h\|_V \;
+\forall \; v_h \in V_h $.  
+}
+\frame{
+\frametitle{Interpolation Operator}
+ Define a map:
+$$\Pi_{h} : {V} \cap C^{0}(\overline{\Omega}) \longrightarrow {V}_{h}$$
+$$\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;u \longmapsto  u_{I}$$
+by  
+\begin{equation}
+(\Pi_{h} u)(x_{1},x_{2})   = u_{I}(x_{1},x_{2})   =\sum_{i=1}^{N} u(\overrightarrow{a_{i}}) \phi_{h}^{i} (x_{1},x_{2})  
+\end{equation}
+where $\{\overrightarrow{a_{i}}\}_{i=1}^{N}$ are the nodes of the triangulation  
+
+and $\{ \phi_{h}^{i}\}_{i=1}^{N}$ is a canonical basis for $V_h$.
+\linebreak\linebreak
+Note that
+\begin{equation}
+(\Pi_{h} u)(\overrightarrow{a_{i}})=u(\overrightarrow{a_{i}}) \qquad
+1\leq i \leq N.
+\end{equation}
+}
+\frame{
+\frametitle{Interpolation Operator}
+\begin{theorem}
+
+Let\\
+$\bullet\;\overline{\Omega}$ be a polygon in $\mathbb{R}^{2}$   \\
+$\bullet\;\tau_{h}$ be a triangulation of $\overline{\Omega}$ into 
+closed triangles.   \\
+$\bullet$ The associated canonical nodal basis functions be
+$\{\phi_{i}\}_{i=1}^{N}$.   \\
+$\bullet\;h_1,h_2$ denote the greatest edge length and the smallest
+angle respectively in the mesh.   \\
+$\bullet\;k$ be the largest integer for which
+$P_{k}(\overline{\Omega})\subseteq V_{h} =
+SPAN\{\phi_{1},\phi_{2},...,\phi_{N}\}$.   \\
+Then, $\exists$ a value $C$ , independent of $u$ and the mesh, such that
+\begin{equation*}
+ |u-u_{I}|_{s} \leq C(\sin h_2)^{-s} h_1^{k+1-s} |u|_{k+1} \; \forall
+u\in H^{k+1}(\Omega), \; \;s=0,1,
+\end{equation*}
+where $u_{I}$ is the interpolant of $u$.
+\end{theorem}
+}
+\frame{
+We obtain,
+$$\parallel u-u_{h}\parallel_{{V}} \leq C h |u|_{2,\Omega}\;
+\forall u\in H^{2}(\Omega).$$
+
+Using {\cbr Aubin-Nitsche duality arguments}, we can show\footfullcite{pani}
+
+$$\parallel u-u_{h}\parallel_{{L^2}(\Omega)} \leq C h^2 |u|_{2,\Omega}\;
+\forall u\in H^{2}(\Omega).$$
+}
+\frame{
+	\frametitle{Implementation}
+	The steps involved in the implementation are:
+	\begin{enumerate}
+\item Construction of the mesh  \\
+\item Calculating the stiffness matrix  \\
+\item Solving the system of linear equations \\
+\end{enumerate}
+}
+\begin{frame}{Mesh}
+The mesh data structure consists of a list of points (co-ordinates) and a list of triangle data structures.
+\linebreak\linebreak
+Each triangle data structure consists a list of the three vertices, which are references to the points, and a list of nodes, which contain the position of the node (which is a reference to a point), and the type of node.
+\end{frame}
+\begin{frame}{Stiffness Matrix}
+After mesh construction, the set of free nodes is determined and an empty matrix of the appropriate dimensions is constructed.
+\linebreak\linebreak
+We iterate over the list of triangles and compute the polynomial coefficients of the basis functions.
+\linebreak\linebreak
+Then, for each pair of the nodal basis functions $\{\phi_i,\phi_j\}$ in the triangle, $\int_{T} \triangledown\phi_i \cdot \triangledown \phi_j$ is calculated and added to the corresponding entry in the stiffness matrix.
+\linebreak\linebreak
+For each basis function, we also calculate $\int_{T}f\phi_i$ for the RHS of the Galerkin problem.
+\end{frame}
+\begin{frame}{Solving the equations}
+The equations are solved using Gaussian elimination.
+\linebreak\linebreak
+For any point in the domain, we find the triangle in which it is contained and take the linear combination of the basis functions corresponding to the nodes in that triangle.
+\end{frame}
+\begin{frame}{References}
+\printbibliography
+\end{frame}
+\end{document}

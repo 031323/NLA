@@ -1,0 +1,26 @@
+\documentclass[12pt]{article}
+\usepackage[hscale=0.8,vscale=0.8]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\setlength{\parskip}{1em}
+
+\pagenumbering{gobble}
+
+\title{Monthly Work Report}
+\date{November 2020}
+\author{Utkarsh Rajput \\\\{Supervisor: Prof. Sarvesh Kumar}}
+\begin{document}
+	\maketitle
+	I studied the Virtual Element Method for ellipctic equations. It is a method to find the approximate solution of the equation on very general meshes, for example, on meshes which have subdivisions in the form of a combination of triangles, quadrilaterals or other polygons with arbitrary number of sides. The discrete space includes some particular non-polynomial functions. The bilinear form $a(.,.)$ and the linear operator $(f,.)$ are calculated for these functions directly using the degrees of freedom, without numerically computiong these functions.
+	
+	I studied the theory of this method, including the discrete space, the degrees of freedom and their unisolvency, approximate binlinear forms and load term, error estimates, and the computational aspects.
+	
+	
+	
+	
+	
+	%I implemented the convergence test for the Finite Element Method with problem with known solution. We compute the approximate error in the $L^{\infty}$ norm, that is, $||u-u_h||_{L^{\infty}}$ for given $h$. This can be approximated by $max_{n\in N} |u(n)-u_h(n)|$ where $N$ is the set of nodal points of the mesh.
+	
+	%I studied and implemented the Eriksson-Johnson error indicator. Error indicators are used for adaptive mesh refinement. In adaptive mesh refinement, those parts of the mesh on which relative error is higher are refined more. This helps in faster convergence of the solution. For piecewise linear elements, error is higher at the points where the gradient of the solution is changing rapidly, that is, the second order derivatives are higher. The Eriksson-Johnson error indicator approximates the magnitude of the second order derivaties. Note that piecewise linear functions are not in $H^2$.
+\end{document}

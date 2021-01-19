@@ -1,0 +1,79 @@
+\documentclass[12pt]{article}
+\usepackage[hscale=0.8,vscale=0.8]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
+
+\setlength{\parskip}{1em}
+
+\pagenumbering{gobble}
+
+\begin{document}
+
+\section{Scaling property of the nodal basis}
+
+Let $K$ be an element in $\mathbb{R}^d$ with vertices $x_1,...,x_n$. 
+
+Let $\phi_i$ be a nodal basis function such that $N_j(\phi_i)=\delta_{i,j} \;\;\forall j$ where $N_j$ are the degrees of freedom. 
+
+Let the element $K'$ be $K$ scaled by $c$. So, its vertices will be $cx_1,...,cx_n$. 
+
+Let $N_j'$ be the corresponding nodal functionals. We show that $\psi_i(x)=\phi_i(x/c)$ will be the new nodal basis functions. For that, we show that $N_j'(\psi_i)=N_j(\phi_i)=\delta_{i,j} \;\;\forall j$. In VEM, we have two differnt types of degrees of freedom. One type is the evaluations, and the other are the moments.
+
+
+If $N_j$ evaluates the function on some point $x_0$, then $N_j'$ evaluates the function on $cx_0$.
+\\So, $N_j'(\psi_i) = \psi_i(cx_0) = \phi(\frac{cx_0}{c}) = \phi(x_0) = N_j'(x_0) = \delta_{i,j}$.
+
+
+If $N_j$ gives a moment, that is, $N_j(\phi_i)=\frac{1}{|K|}\int_K (\frac{x-x_K}{h_K})^s\phi_i(x)\;dx$.
+
+Then $N_j(\psi_i)=\frac{1}{|K'|}\int_{K'} (\frac{x-x_K'}{h_K'})^s\psi_i(x)\;dx$, which, by a change of variables is equal to the following. 
+
+$\frac{1}{|K'|}\int_K (\frac{cy-x_K'}{h_K'})^s\psi_i(cy)\;d(cy)=\frac{1}{c^d|K|}\int_K (\frac{cy-cx_K}{ch_K})^s\phi_i(y)\;c^ddy=N_j(\phi_i)=\delta_{i,j}$.
+
+Thus we have proved that $N_j'(\psi_i)=N_j(\phi_i)\;\;\forall j$, and hence, $\psi_i$ are the new nodal basis functions.
+
+Clearly, $\triangledown\psi_i(x)=\triangledown\phi_i(x/c)/c$, so we have the following.
+
+$\int_{K'} \triangledown\psi_i(x) \cdot\triangledown\psi_i(x) \;dx
+=\int_{K} \triangledown\psi_i(cy) \cdot\triangledown\psi_i(cy) \;d(cy)
+=\int_K \frac{\triangledown\phi_i(y) \cdot \triangledown\phi_i(y)}{c^2}\;c^dd(y)$.
+
+Which, if $d=2$, is equal to $\int_K \triangledown\phi_i(y) \cdot \triangledown\phi_i(y)\;d(y)$.
+
+Note that we have only shown that $a(\phi_i,\phi_i)$ is same for all elements of same shape and orientation, that is, for elements which differ only by scaling and translation. But, we can have elements with different shapes and even different number of vertices.
+
+ In VEM, we have the assumption that there exist $\gamma_1$ and $\gamma_2$ such that for any element with diameter $h_K$, it is star shaped with respect to a ball of radius $\gamma_1 h_K$ and the distance between any two vertices is greater than $\gamma_2 h_K$.
+  What we want to finally prove is that with these assumptions, there exist $\alpha_1,\alpha_2>0$, depending only on $\gamma_1$ and $\gamma_2$ such that for all $K$ and for all $i$, $\alpha_1 < a(\phi_i,\phi_i)<\alpha_2$.
+\pagebreak
+
+\section{Limit on the number of vertices}
+
+Let $K$ be an element. Let $v_0$ be any arbitrary vertex of $K$. Clearly, all the vertices are contained in $B(v_0,h_K)$.
+
+As the distance between any two vertices is greater than $\gamma_2 h_K$, $B(v_i,\frac{\gamma_2 h_K}{2})$ and $B(v_j,\frac{\gamma_2 h_K}{2})$ are non intersecting for $i \ne j$. Also, for all $i$, $B(v_i,\frac{\gamma_2 h_K}{2})$ is contained in $B(v_0,h_K+\frac{\gamma_2 h_K}{2})$.
+
+Clearly, the number of non-intersecting balls of radius $r$ that can be contained in a ball of radius $R$ depends only on the ratio $R/r$, which in our case is $\frac{2}{\gamma_2}+1$, which depends only on $\gamma_2$, hence is constant for all elements in the triangulation.
+\end{document}

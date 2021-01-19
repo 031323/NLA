@@ -1,0 +1,50 @@
+\documentclass[12pt]{article}
+\usepackage[hscale=0.8,vscale=0.8]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
+
+\setlength{\parskip}{1em}
+
+\pagenumbering{gobble}
+
+\begin{document}
+	Let $\{\phi_i\}_{i=1,2,...,n}$ be a basis of $V_h$. Let $a(.,.)$ be an inner product on $V_h$. Then, the matrix $\textbf{B}=[a(\phi_i,\phi_j)]_{n\times n}$ is non-singular.
+	
+	 \textbf{Proof:}
+	 
+	Assume that $\{c_1,c_2,...,c_n\}\subset \mathbb{R}$ which satisfies the following.
+	$$\textbf{B}
+	 \begin{bmatrix}
+	c_1\\c_2\\\vdots\\c_n
+	\end{bmatrix}=0$$
+	
+	$\implies \forall i \in \{1,2,...,n\},\;\;\;\;\;\;\;\; \sum\limits_{j=1}^n c_j a(\phi_i,\phi_j)=0 $
+	
+	$\implies \forall i \in \{1,2,...,n\},\;\;\;\;\;\;\;\; a(\phi_i,\sum\limits_{j=1}^n c_j\phi_j)=0 $
+	
+	As $\{\phi_i\}$ is a basis of $V_h$ and the above is true for all $i$, we get that $\sum_{j=1}^n c_j\phi_j=0$. But $\{\phi_j\}$ are linearly independent. Hence $c_j=0\;\;\;\forall j \in \{1,2,...,n\}$. Thus, the columns of $\textbf{B}$ are linearly independent and hence $\textbf{B}$ is non-singular.
+	
+\end{document}

@@ -1,0 +1,18 @@
+\documentclass[12pt]{article}
+\usepackage[hscale=0.8,vscale=0.8]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\setlength{\parskip}{1em}
+
+\pagenumbering{gobble}
+
+\title{Monthly Work Report}
+\date{August 2020}
+\author{Utkarsh Rajput \\\\{Supervisor: Prof. Sarvesh Kumar}}
+\begin{document}
+	\maketitle
+	I studied the construction of the finite element space by first dividing the domain into a mesh of triangles (or other polygon), then defining a space of functions on each triangle, along with a nodal basis which ensures unisolvency. For the confirming finite element method, a space of continuous functions on the whole mesh is constructed whose restriction to each triangle lies in the space defined for that triangle. I studied the lagrange and hermite finite elements, along with proofs of their unisolvency. We also implemented the hermite element for cubic polynomials, which included finding the basis functions for each element and determining the free nodes. Other parts of the program are same as that for lagrange element.
+	
+	For the error estimates of the finite element method, I studied the theorems estimating the interpolation error using Riesz potential, and the Aubin-Nitsche duality arguments for the error in $L^2$ norm.
+\end{document}

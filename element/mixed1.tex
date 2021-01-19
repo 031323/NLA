@@ -1,0 +1,110 @@
+\documentclass[12pt]{article}
+\usepackage[hscale=0.8,vscale=0.8]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
+
+\setlength{\parskip}{1em}
+
+\pagenumbering{gobble}
+
+\begin{document}
+\section{Dirichlet Boundary Condition}
+Let $\Omega$ be a bounded domain of $\mathbb{R}^n$ with Lipschitz-continuous boundary $\Gamma$. Let
+ $f\in L^2(\Omega)$, $g\in H^{1/2}(\Gamma)$. Assume $(\sigma,u)\in H(\text{div};\Omega)\times L^2(\Omega)$ satisfies the following.
+\begin{equation}
+\begin{split}
+\int_{\Omega}\sigma\cdot\tau +\int_{\Omega}u \triangledown \cdot \tau & \;\;=\;\;  \langle \gamma_{\textbf{n}}(\tau),g \rangle \;\;\;\;\;\;\;\;\forall\tau\in H(\text{div};\Omega)\\
+\int_{\Omega}v \triangledown \cdot \sigma & \;\;=\;\; -\int_{\Omega}fv\;\;\;\;\;\;\;\;\;\;\;\forall v \in L^2(\Omega)
+\end{split}
+\end{equation}
+Then, by the second part of (1), $\triangledown\cdot \sigma=f$. Applying Green's identity to the first part, we get the following if $u\in H^1(\Omega)$.
+\begin{equation}
+\begin{split}
+\int_{\Omega}\sigma\cdot\tau -\int_{\Omega}\triangledown u\cdot \tau +  \langle \gamma_{\textbf{n}}(\tau),\gamma_0 (u) \rangle  \;\;&=\;\;  \langle \gamma_{\textbf{n}}(\tau),g \rangle \;\;\;\;\;\;\;\;\forall\tau\in H(\text{div};\Omega)\\
+\implies
+\int_{\Omega}\sigma\cdot\tau -\int_{\Omega}\triangledown u\cdot \tau   \;\;&=\;\; 0\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\forall\tau\in H(\text{div};\Omega):\gamma_{\textbf{n}}(\tau)=0\\
+\end{split}
+\end{equation}
+Thus, $\sigma=\triangledown u$ in $\Omega$ and hence, $\Delta u=f$ in $\Omega$. Also, we get the following from (2).
+$$ \langle \gamma_{\textbf{n}}(\tau),\gamma_0 (u) \rangle  \;\;=\;\;  \langle \gamma_{\textbf{n}}(\tau),g \rangle \;\;\;\forall\tau\in H(\text{div};\Omega)\\$$
+Which gives $u=g$ on $\Gamma$.
+
+\section{Mixed Boundary Condition}
+Let $\Omega$ be a bounded domain of $\mathbb{R}^n$ with Lipschitz-continuous boundary $\Gamma$ with disjoint parts $\Gamma_D$ and $\Gamma_N$, $|\Gamma_D|\ne 0$. Let
+ $f\in L^2(\Omega)$, $g\in H^{-1/2}(\Gamma_N)$.
+ 
+ Assume $(\sigma,(u,\zeta))\in H(\text{div};\Omega)\times (L^2(\Omega)\times H^{1/2}_{00}(\Gamma_N))$ satisfies the following.
+ \begin{equation}
+\begin{split}
+\int_{\Omega}\sigma\cdot\tau +\int_{\Omega}u\triangledown\cdot\tau +  \langle \gamma_{\textbf{n}}(\tau)|_{\Gamma_N},\zeta \rangle _{\Gamma_N}& \;\;=\;\; 0\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\forall\tau\in H(\text{div};\Omega)\\
+\int_{\Omega}v\triangledown\cdot\sigma +  \langle \gamma_{\textbf{n}}(\sigma)|_{\Gamma_N},\eta \rangle _{\Gamma_N} & \;\;=\;\; -\int_{\Omega}fv+ \langle g,\eta \rangle _{\Gamma_N}\;\;\;\;\;\;\;\forall (v,\eta) \in L^2(\Omega)\times H^{1/2}_{00}(\Gamma_N)
+\end{split}
+\end{equation}
+By setting $\eta=0$, we get the following.
+$$ \int_{\Omega}v\triangledown\cdot\sigma \;\;=\;\; -\int_{\Omega}fv\;\;\;\;\;\;\;\;\forall v \in L^2(\Omega) $$
+Hence $\triangledown\cdot\sigma=f$ in $\Omega$. Similarly, by setting $v=0$, we get the following.
+ $$   \langle \gamma_{\textbf{n}}(\sigma)|_{\Gamma_N},\eta \rangle _{\Gamma_N}  \;\;=\;\; \langle g,\eta \rangle _{\Gamma_N}\;\;\;\;\;\;\;\forall \eta \in H^{1/2}_{00}(\Gamma_N) $$
+Hence, $\gamma_{\textbf{n}}(\sigma)|_{\Gamma_N}=g$.
+
+Applying Green's identity to the first part of (3), we get the following if $u\in H^1(\Omega)$.
+\begin{equation*}
+\begin{split}
+\int_{\Omega}\sigma\cdot\tau -\int_{\Omega}\triangledown u\cdot \tau +  \langle \gamma_{\textbf{n}}(\tau),\gamma_0 (u) \rangle  +  \langle \gamma_{\textbf{n}}(\tau)|_{\Gamma_N},\zeta \rangle _{\Gamma_N} \;\;&=\;\; 0\;\;\;\;\;\;\;\forall\tau\in H(\text{div};\Omega)\\
+\implies \int_{\Omega}\sigma\cdot\tau -\int_{\Omega}\triangledown u\cdot \tau  \;\;&=\;\; 0\;\;\;\;\;\;\;\forall\tau\in H(\text{div};\Omega):\gamma_{\textbf{n}}(\tau)=0 \\
+\end{split}
+\end{equation*}
+Thus, $\sigma=\triangledown u$ in $\Omega$ and hence, $\Delta u=f$ in $\Omega$ and $\gamma_{\textbf{n}}(\triangledown u)|_{\Gamma_N}=g$. Also, we get the following.
+\begin{equation*}
+\begin{split}
+ \langle \gamma_{\textbf{n}}(\tau),\gamma_0 (u) \rangle  +  \langle \gamma_{\textbf{n}}(\tau)|_{\Gamma_N},\zeta \rangle _{\Gamma_N} \;\;&=\;\; 0\;\;\;\;\;\;\;\forall\tau\in H(\text{div};\Omega)\\
+\implies  \langle \gamma_{\textbf{n}}(\tau),\gamma_0 (u) \rangle  +  \langle \gamma_{\textbf{n}}(\tau),E_{N,0}(\zeta) \rangle  \;\;&=\;\; 0\;\;\;\;\;\;\;\forall\tau\in H(\text{div};\Omega)\\
+\end{split}
+\end{equation*}
+Thus, $\gamma_0(u)=E_{N,0}(\zeta)$, which, by definition, is $0$ on $\Gamma_D$.
+
+Conversely, if $u\in H^2(\Omega)$ such that $-\Delta u=f$ in $\Omega$, $u=0$ on $\Gamma_D$ and $\triangledown u\cdot \textbf{n}=g$ on $\Gamma_N$, then $(\triangledown u,(u,-\gamma_0(u)))$ satisfy the set of equations (3).
+
+
+\iftrue
+We now prove the existence and uniquness of the solution of (3). For that, we first show that the operator $B:H(\text{div},\Omega)\to(L^2(\Omega)\times H^{1/2}_{00}(\Gamma_N))'=L^2(\Omega)'\times H^{1/2}_{00}(\Gamma_N)'$ is surjective. Thus, given $(v_1,\eta_1)\in L^2(\Omega)'\times H^{1/2}_{00}(\Gamma_N)$, we need to find $\tau\in H(\text{div},\Omega)$ such that the following holds.
+$$
+\int_{\Omega}v\triangledown\cdot\tau +  \langle \gamma_{\textbf{n}}(\tau)|_{\Gamma_N},\eta \rangle _{\Gamma_N} \;\;=\;\; \int_{\Omega}v_1v+ \langle \eta_1,\eta \rangle _{\Gamma_N}\;\;\;\;\;\;\;\forall (v,\eta) \in L^2(\Omega)\times H^{1/2}_{00}(\Gamma_N)
+$$
+Thus, find $\tau\in H(\text{div},\Omega)$ such that $\triangledown \cdot \tau=v_1$ and $\gamma_{\textbf{n}}(\tau)|_{\Gamma_N}=\eta_1$.
+
+We know that the following equation has a unique solution.
+$$
+z\in  H^1_{\Gamma_D}(\Omega):\;\;\;\int_{\Omega}\triangledown z\cdot \triangledown w=-\int_{\Omega}v_1w+ \langle \eta_1,\gamma_0(w) \rangle\;\;\;\forall w\in H^1_{\Gamma_D}(\Omega)
+$$
+Where $H^1_{\Gamma_D}(\Omega)=\{w\in H^1(\Omega):\gamma_0(w)=0\;\;\text{on}\;\;\Gamma_D\}$.
+
+Thus, take $\tau=\triangledown z$. As $-\int_{\Omega}\triangledown w \cdot \tau =\int_{\Omega}v_1w$ for all $w\in C^{\infty}_0(\Omega)$, we have $\triangledown \cdot \tau=v_1$ by the distributional sense of divergence.
+
+Next, we show that $a(.,.):H(\text{div},\Omega)\times H(\text{div},\Omega)\to \mathbb{R}$ is elliptic on $\text{Ker}(B)$. Indeed, if $\tau \in \text{Ker}(B)$, then $\triangledown \cdot \tau=0$, thus, $||\tau||^2_{div,\Omega}=||\tau||^2_{0,\Omega}=a(\tau,\tau)$.
+\fi
+%\section{Equivalent conditions for $A_0$}
+%Let $A_0:\text{Ker}(B)\to\text{Ker}(B)'$ be defined by $(A_0 u)v=a(u,v)$.
+\end{document}

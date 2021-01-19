@@ -1,0 +1,33 @@
+\documentclass{beamer}
+\usepackage[english]{babel}
+\usepackage{biblatex}
+\addbibresource{fem.bib}
+\title{Finite Element Method for Elliptic Equations}
+\subtitle{Presentation}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{footline}{\hfill\usebeamertemplate***{navigation symbols}}
+%\usetheme{lucid}
+\begin{document}
+	\frame{
+		\titlepage
+	}
+	\frame{
+		\frametitle{Introduction}
+		Finite Element Method is a numerical method for solving Partial Differential Equations\footfullcite{pani}.
+		
+		The main steps are:
+		
+		1. Variational Formulation
+		
+		2. Discretization of the problem
+		
+		3. Converting to a system of linear equations
+		
+		4. Solving the system of linear equations
+		
+	}
+	\frame{
+		\frametitle{}
+	}
+	\printbibliography
+\end{document}

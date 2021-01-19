@@ -1,0 +1,23 @@
+\documentclass[12pt]{article}
+\usepackage[hscale=0.8,vscale=0.8]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\setlength{\parskip}{1em}
+
+\pagenumbering{gobble}
+
+\title{Monthly Work Report}
+\date{December 2020}
+\author{Utkarsh Rajput \\\\{Supervisor: Prof. Sarvesh Kumar}}
+\begin{document}
+	\maketitle
+	I studied the equivalent projecters for virtual element method. A variant of the virtual element method was introduced which, for degree of accuracy $k$, allows the exact computation of the $L^2$ projection on polynomials of degree $\le k$.
+	
+	I also studied the discretization of the Poisson problem in the framework of the mixed finite element method. Discretization in the mixed method involves choosing two discrete sub-spaces in such a manner that certain properties for the bilinear forms are satisfied. In particular, if $a(.,.)$ and $b(.,.)$ are the two bilinear forms and $A$ and $B$ are the respective induced operators, then the restriction of $A$ to the kernel of $B$ must be invertibe in kernel of $B$. On the other hand, $b(.,.)$ must satisfy the Inf-Sup condition. For the discretization of the Poisson problem, these properties are satisfied, for one, by the pair of spaces consisting of the global Raviart-Thomas space of order $k$ and the space of piecewise polynomials of degree $k$.
+
+	%I implemented the convergence test for the Finite Element Method with problem with known solution. We compute the approximate error in the $L^{\infty}$ norm, that is, $||u-u_h||_{L^{\infty}}$ for given $h$. This can be approximated by $max_{n\in N} |u(n)-u_h(n)|$ where $N$ is the set of nodal points of the mesh.
+	
+	%I studied and implemented the Eriksson-Johnson error indicator. Error indicators are used for adaptive mesh refinement. In adaptive mesh refinement, those parts of the mesh on which relative error is higher are refined more. This helps in faster convergence of the solution. For piecewise linear elements, error is higher at the points where the gradient of the solution is changing rapidly, that is, the second order derivatives are higher. The Eriksson-Johnson error indicator approximates the magnitude of the second order derivaties. Note that piecewise linear functions are not in $H^2$.
+
+\end{document}

@@ -1,0 +1,26 @@
+\frame{
+		\frametitle{$P_1$ Nonconforming Element}
+		In the $P_1$ nonconforming element, the functions are linear on each triangle and the three evaluation points are at the midpoints of the edges.
+		\linebreak\linebreak
+		Thus, the functions are in general discontinuous at the edges except at the midpoints.
+	}
+	\frame{
+		\frametitle{$P_1$ Nonconforming Element}
+		Let $V=H_{o}^{1}(\Omega)$.
+		\linebreak\linebreak
+		Then in the $P_1$ nonconforming element, $V_h$ is not a subspace of $V$.
+		\linebreak\linebreak
+		Define $a_h(v,w)=\sum\limits_{T \in \mathcal{T}_h} \int_T \triangledown v \cdot \triangledown w $$dx$
+		\linebreak\linebreak
+		And $||v||_h=\sqrt{a_h(v,v)} $
+		\linebreak\linebreak
+		Then, $a_h(.,.) \equiv a(.,.)$ on $V$.
+		\linebreak\linebreak
+		Also $a_h$ is positive-definite on $V_h$.
+	}
+	
+	\frame{
+		\frametitle{$P_1$ Nonconforming Element}
+		\textbf{Theorem} If $\Omega$ is a convex polygonal domain , $f \in L^2(\Omega)$ then
+		$$ ||u-u_h||_h<Ch^2|u|_{H^2(\Omega)} $$.
+	}

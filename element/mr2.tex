@@ -1,0 +1,17 @@
+\documentclass[12pt]{article}
+\usepackage[hscale=0.8,vscale=0.8]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\setlength{\parskip}{1em}
+
+\pagenumbering{gobble}
+
+\title{Monthly Work Report}
+\date{September 2020}
+\author{Utkarsh Rajput \\\\{Supervisor: Prof. Sarvesh Kumar}}
+\begin{document}
+	\maketitle
+	I studied implementing the nonconforming finite element method, in particular, the $P_1$ element, which consists of a triangular mesh with nodes placed on the  midpoints of the edges. Thus each triangle has three nodes which determine the linear function on that triangle. Positive-definiteness of the semi-norm $||v_h||_h=\sqrt{\sum_{K}{|v_h|_{1,K}^{2}}} $ for the $P_1$ element is proved for the case of homogenous Dirichlet boundary conditions, thus making it a norm. Now, after proving the ellipticity of the approximate bilinear form, we can apply the second Strang lemma to proceed for finding the error estimates. The lemma gives two terms that need to be bounded. The first term $\inf_{v_h \in V_h} ||u-v_h||_h$ is bounded by the interpolation error. The second term, $\sup_{w_h \in V_h}\frac{|a_h(u,w_h)-f(w_h)|}{||w_h||_h}	$ is the term that comes due to nonconformity and is dealt with seperately.
+
+\end{document}
