@@ -530,5 +530,3 @@ def XC(x1,x2):
 		for j in range(len(x1[0])):
 			if abs(x1[i][j]-x2[i*2][j*2])<0.0001:
 				print(i,j)
-
-
